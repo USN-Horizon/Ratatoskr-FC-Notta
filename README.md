@@ -18,12 +18,6 @@ Ratatoskr-FC-Notta/
 |- platformio.ini            <- PlatformIO configuration
 ```
 
-## Hardware Requirements
-
-- **Teensy 4.1** microcontroller
-- **BME280** pressure/temperature sensor
-- **LSM6DSO32** IMU (accelerometer/gyroscope)
-
 ## Build & Setup
 
  The easiest way to build and run this project is through the PlatformIO extension installed in either VSCode or CLion.
