@@ -1,4 +1,3 @@
-#include "FC.h"
 #include "arduino_freertos.h"
 #include "tasks/SensorTask.h"
 #include "tasks/FilterTask.h"

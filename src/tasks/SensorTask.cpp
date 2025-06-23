@@ -1,5 +1,4 @@
 #include "SensorTask.h"
-#include "../IMU.h"
 #include "../../lib/sensors/BME280.cpp"
 #include "../../lib/sensors/LSM6DSO32.cpp"
 
