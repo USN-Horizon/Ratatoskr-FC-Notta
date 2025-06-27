@@ -4,6 +4,7 @@
 #include "tasks/LogTask.h"
 #include "tasks/ActuationTask.h"
 #include "tasks/RadioTask.h"
+#include "tasks/StateTask.h"
 
 
 void setup() {
@@ -14,9 +15,11 @@ void setup() {
   init_task_Log();
   init_task_Actuation();
   init_task_Radio();
+  init_task_State();
   
   vTaskStartScheduler();
 }
 
 void loop() {
+  // Not used
 }
