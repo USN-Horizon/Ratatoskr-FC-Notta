@@ -6,6 +6,11 @@
 #define FILTER_TASK_PERIOD_MS 20
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
+#include "../fc_data.h"
+
+extern FC_Data fc_data;
+extern SemaphoreHandle_t fc_data_mutex;
 
 extern TaskHandle_t filterTaskHandle;
 
