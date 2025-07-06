@@ -1,6 +1,7 @@
 #include "SensorTask.h"
 #include "../../lib/sensors/BME280.cpp"
 #include "../../lib/sensors/LSM6DSO32.cpp"
+#include "../../lib/sensors/MAX_M10S.cpp"
 
 TaskHandle_t sensorTaskHandle = NULL;
 
