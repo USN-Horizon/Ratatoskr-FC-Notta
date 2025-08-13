@@ -9,17 +9,20 @@ For example, see the structure of the following example libraries `Foo` and `Bar
 
 |--lib
 |  |
-|  |--Bar
-|  |  |--docs
-|  |  |--examples
-|  |  |--src
-|  |     |- Bar.c
-|  |     |- Bar.h
-|  |  |- library.json (optional. for custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
-|  |
-|  |--Foo
-|  |  |- Foo.c
-|  |  |- Foo.h
+|  |--sensors
+|  |  |--Bar
+|  |  |  |--docs
+|  |  |  |--examples
+|  |  |  |--src
+|  |  |     |- Bar.c
+|  |  |     |- Bar.h
+|  |  |  |- library.json (optional. for custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
+|  |  |
+|  |  |--Foo
+|  |  |  |- Foo.c
+|  |  |  |- Foo.h
+|  |--storage
+|  |  |--...
 |  |
 |  |- README --> THIS FILE
 |
