@@ -1,8 +1,6 @@
-#pragma once
-#include "Sensor.h"
-#include <SPI.h>
+#include "KX134.h"
 
-// SPI pin for CS (bh_CS2)
+// SPI pin for CS
 #define CS_PIN 6  
 
 // Registeradresser
@@ -12,84 +10,75 @@
 #define INC1     0x1F
 #define XOUT_L   0x08
 
-class KX134Sensor : public Sensor {
-public:
-    // arver navnet og intervallet fra baseklassen
-    KX134Sensor(unsigned long interval = 100) 
-        : Sensor("KX134", interval) {}
+KX134Sensor::KX134Sensor(unsigned long interval) 
+    : Sensor("KX134", interval) {}
 
-    bool setup() override {
-        pinMode(CS_PIN, OUTPUT);
-        digitalWrite(CS_PIN, HIGH);
-        SPI.begin();
+bool KX134Sensor::setup() {
+    pinMode(CS_PIN, OUTPUT);
+    digitalWrite(CS_PIN, HIGH);
+    SPI.begin();
 
-        // Sjekk WHO_AM_I
-        uint8_t id = readRegister(WHO_AM_I);
-        if (id != 0x46) {
-            Serial.print(F("[KX134] WHO_AM_I feil: 0x"));
-            Serial.println(id, HEX);
-            setReady(false);
-            return false;
-        }
-
-        // Init-sekvens
-        writeRegister(CNTL1, 0x00);  // Standby
-        writeRegister(ODCNTL, 0x02); // 50 Hz
-        writeRegister(CNTL1, 0xC0);  // Operating mode, High-res, ±8g
-        writeRegister(INC1, 0x10);   // Burst read
-
-        Serial.println(F("[KX134] Init OK"));
-        setReady(true);
-        return true;
+    uint8_t id = readRegister(WHO_AM_I);
+    if (id != 0x46) {
+        Serial.print(F("[KX134] WHO_AM_I feil: 0x"));
+        Serial.println(id, HEX);
+        setReady(false);
+        return false;
     }
 
-    void update() override {
-        if (!isReady()) return;      // hopp over hvis ikke startet
-        if (!shouldUpdate()) return; // sjekk intervallet
+    writeRegister(CNTL1, 0x00);  // Standby
+    writeRegister(ODCNTL, 0x02); // 50 Hz
+    writeRegister(CNTL1, 0xC0);  // Operating mode, High-res, ±8g
+    writeRegister(INC1, 0x10);   // Burst read
 
-        int16_t x, y, z;
-        readRaw(x, y, z);
+    Serial.println(F("[KX134] Init OK"));
+    setReady(true);
+    return true;
+}
 
-        Serial.print("[KX134] X: "); Serial.print(x * 0.000244);
-        Serial.print(" g, Y: ");     Serial.print(y * 0.000244);
-        Serial.print(" g, Z: ");     Serial.print(z * 0.000244);
-        Serial.println(" g");
+void KX134Sensor::update() {
+    if (!isReady()) return;
+    if (!shouldUpdate()) return;
+
+    int16_t x, y, z;
+    readRaw(x, y, z);
+
+    Serial.print("[KX134] X: "); Serial.print(x * 0.000244);
+    Serial.print(" g, Y: ");     Serial.print(y * 0.000244);
+    Serial.print(" g, Z: ");     Serial.print(z * 0.000244);
+    Serial.println(" g");
+}
+
+void KX134Sensor::info() {
+    Serial.println(F("[KX134] Akselerometer aktiv (±8g, 50 Hz)"));
+}
+
+uint8_t KX134Sensor::readRegister(uint8_t reg) {
+    digitalWrite(CS_PIN, LOW);
+    SPI.transfer(reg | 0x80);
+    uint8_t val = SPI.transfer(0x00);
+    digitalWrite(CS_PIN, HIGH);
+    return val;
+}
+
+void KX134Sensor::writeRegister(uint8_t reg, uint8_t val) {
+    digitalWrite(CS_PIN, LOW);
+    SPI.transfer(reg & 0x7F);
+    SPI.transfer(val);
+    digitalWrite(CS_PIN, HIGH);
+}
+
+void KX134Sensor::readRaw(int16_t &x, int16_t &y, int16_t &z) {
+    uint8_t data[6];
+    digitalWrite(CS_PIN, LOW);
+    SPI.transfer(XOUT_L | 0x80);
+    for (int i = 0; i < 6; i++) {
+        data[i] = SPI.transfer(0x00);
     }
+    digitalWrite(CS_PIN, HIGH);
 
-    void info() override {
-        Serial.println(F("[KX134] Akselerometer aktiv (±8g, 50 Hz)"));
-    }
-
-private:
-    uint8_t readRegister(uint8_t reg) {
-        digitalWrite(CS_PIN, LOW);
-        SPI.transfer(reg | 0x80);
-        uint8_t val = SPI.transfer(0x00);
-        digitalWrite(CS_PIN, HIGH);
-        return val;
-    }
-
-    void writeRegister(uint8_t reg, uint8_t val) {
-        digitalWrite(CS_PIN, LOW);
-        SPI.transfer(reg & 0x7F);
-        SPI.transfer(val);
-        digitalWrite(CS_PIN, HIGH);
-    }
-
-
-    //Burst read er at du leser flere registerer etter hverandre i en sammenhengende operasjon
-    void readRaw(int16_t &x, int16_t &y, int16_t &z) {
-        uint8_t data[6]; //6 raa-byte, 2 bytes for x, y og z(LSB + MSB)
-        digitalWrite(CS_PIN, LOW);
-        SPI.transfer(XOUT_L | 0x80); // Start burst-read
-        for (int i = 0; i < 6; i++) {
-            data[i] = SPI.transfer(0x00);
-        }
-        digitalWrite(CS_PIN, HIGH);
-
-        x = (int16_t)(data[1] << 8 | data[0]);
-        y = (int16_t)(data[3] << 8 | data[2]);
-        z = (int16_t)(data[5] << 8 | data[4]);
-    }
-};
+    x = (int16_t)(data[1] << 8 | data[0]);
+    y = (int16_t)(data[3] << 8 | data[2]);
+    z = (int16_t)(data[5] << 8 | data[4]);
+}
 
