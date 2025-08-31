@@ -1,50 +1,55 @@
 #include "MAX_M10S.h"
-#include <Wire.h>
-#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 
-// Lager et objekt av GNSS-klassen fra SparkFun-biblioteket
-SFE_UBLOX_GNSS myGNSS;
+MAXM10SSensor::MAXM10SSensor(unsigned long interval)
+    : Sensor("MAX-M10S", interval) {}
 
-bool maxM10SInit() {
-  Wire.begin(); // Starter I2C-bussen
+bool MAXM10SSensor::setup() {
+    Wire.begin();
 
-  if (!myGNSS.begin()) {
-    Serial.println("MAX-M10S ikke funnet. Sjekk tilkoblingene.");
-    return false;
-  }
+    if (!myGNSS.begin()) {
+        Serial.println(F("[MAX-M10S] Ikke funnet. Sjekk tilkoblingene."));
+        setReady(false);
+        return false;
+    }
 
-  Serial.println("MAX-M10S startet via I2C!");
+    Serial.println(F("[MAX-M10S] Startet via I2C!"));
 
-  // Aktiver både UBX (binær) og NMEA (tekst) meldinger
-  myGNSS.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA);
+    myGNSS.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA); // UBX + NMEA meldinger
+    myGNSS.setNavigationFrequency(1); // 1 Hz
 
-  // Sett posisjonsoppdatering til 1 Hz (en gang i sekundet)
-  myGNSS.setNavigationFrequency(1);
-
-  return true;
+    setReady(true);
+    return true;
 }
 
-void maxM10SUpdate() {
-  myGNSS.checkUblox(); // Leser ny data hvis tilgjengelig
+void MAXM10SSensor::update() {
+    if (!isReady()) return;
+    if (!shouldUpdate()) return;
+
+    myGNSS.checkUblox(); // Henter ny data hvis tilgjengelig
+
+    Serial.print(F("[MAX-M10S] Lat: ")); Serial.print(getLatitude(), 6);
+    Serial.print(F(", Lon: "));          Serial.print(getLongitude(), 6);
+    Serial.print(F(", Alt: "));          Serial.print(getAltitude());
+    Serial.print(F(" m, Sats: "));       Serial.println(getSatellites());
 }
 
-//Returnerer siste kjente breddegrad i desimalgrader.
-double maxM10SGetLatitude() {
-  return myGNSS.getLatitude() / 10000000.0;
+void MAXM10SSensor::info() {
+    Serial.println(F("[MAX-M10S] GNSS-modul aktiv (1 Hz)"));
 }
 
-//Returnerer siste kjente lengdegrad i desimalgrader.
-double maxM10SGetLongitude() {
-  return myGNSS.getLongitude() / 10000000.0;
+double MAXM10SSensor::getLatitude() {
+    return myGNSS.getLatitude() / 10000000.0;
 }
 
-//Returnerer høyde over havet i meter.
-double maxM10SGetAltitude() {
-  return myGNSS.getAltitude() / 1000.0;
+double MAXM10SSensor::getLongitude() {
+    return myGNSS.getLongitude() / 10000000.0;
 }
 
-//Returnerer antall satellitter i visning.
-uint8_t maxM10SGetSatellites() {
-  return myGNSS.getSIV();
+double MAXM10SSensor::getAltitude() {
+    return myGNSS.getAltitude() / 1000.0;
+}
+
+uint8_t MAXM10SSensor::getSatellites() {
+    return myGNSS.getSIV();
 }
 
