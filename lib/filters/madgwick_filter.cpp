@@ -35,15 +35,20 @@ void madgwick_filter::filter_update(float acc_x, float acc_y,float acc_z,float g
     float half_q_z = 0.5 * q_z; 
 
     float two_q_w  = 2.0* q_w;
-    float two_q_x  = 2.0* q_w;
-    float two_q_y  = 2.0* q_w;
+    float two_q_x  = 2.0* q_x;
+    float two_q_y  = 2.0* q_y;
 
     //normalize  the accelometer
 
     norm = sqrt(acc_x*acc_x + acc_y*acc_y + acc_z*acc_z); 
-    acc_x /= norm; 
-    acc_y /= norm; 
-    acc_z /= norm; 
+    if (norm > 0.0f) {
+        acc_x /= norm; 
+        acc_y /= norm; 
+        acc_z /= norm;
+    } else {
+        // If acceleration is zero, skip accelerometer correction
+        return;
+    } 
     //compute the objective function and Jacobian
     f_1 = two_q_x * q_z - two_q_w * q_y - acc_x;
     f_2 = two_q_w * q_x + two_q_y * q_z - acc_y; 
@@ -65,10 +70,12 @@ void madgwick_filter::filter_update(float acc_x, float acc_y,float acc_z,float g
 
 
     norm = sqrt(q_hat_dot_w*q_hat_dot_w + q_hat_dot_x*q_hat_dot_x + q_hat_dot_y*q_hat_dot_y + q_hat_dot_z*q_hat_dot_z );
-    q_hat_dot_w /= norm; 
-    q_hat_dot_x /= norm; 
-    q_hat_dot_y /= norm; 
-    q_hat_dot_z /= norm; 
+    if (norm > 0.0f) {
+        q_hat_dot_w /= norm; 
+        q_hat_dot_x /= norm; 
+        q_hat_dot_y /= norm; 
+        q_hat_dot_z /= norm;
+    } 
 
     q_dot_omega_w = -half_q_x * gyro_x - half_q_y * gyro_y - half_q_z * gyro_z; 
     q_dot_omega_x = half_q_w * gyro_x + half_q_y * gyro_z - half_q_z * gyro_y; 
@@ -81,10 +88,12 @@ void madgwick_filter::filter_update(float acc_x, float acc_y,float acc_z,float g
     q_z += (q_dot_omega_z -(beta*q_hat_dot_z)) * delta_t; 
 
     norm = sqrt(q_w*q_w + q_x*q_x + q_y*q_y + q_z*q_z);
-    q_w /= norm; 
-    q_x /= norm; 
-    q_y /= norm; 
-    q_z /= norm;   
+    if (norm > 0.0f) {
+        q_w /= norm; 
+        q_x /= norm; 
+        q_y /= norm; 
+        q_z /= norm;
+    }   
 }
 
 
