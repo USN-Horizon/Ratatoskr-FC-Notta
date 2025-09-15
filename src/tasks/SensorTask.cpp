@@ -6,11 +6,23 @@
 
 TaskHandle_t sensorTaskHandle = NULL;
 
+KX134Sensor kx134(500);
+
 void task_Sensor(void *pvParameters) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xFrequency = pdMS_TO_TICKS(SENSOR_TASK_PERIOD_MS);
+
+    if(!kx134.setup()){
+        Serial.println(F("[SensorTask] KX134 init failed!"));
+    }
+    else{
+        kx134.info();
+    }
+
     
     while (1) {
+        kx134.update();
+        
         // Read IMU data
         
         // Read BME280
