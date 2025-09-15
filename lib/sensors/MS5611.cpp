@@ -1,3 +1,8 @@
+//Explenation so we know what this ACTUALLY MEANS:
+//ADC stands for analog to digital converter
+// OSR stands for oversampling ratio, this is for more accurate results and less interference
+//Highest OSR is 4096 but converting takes 9ms
+
 #include "MS5611.h"
 
 // MS5611 Commands
@@ -10,10 +15,11 @@
 #define CMD_ADC_1024    0x04
 #define CMD_ADC_2048    0x06
 #define CMD_ADC_4096    0x08
-#define CMD_PROM_READ   0xA0
+#define CMD_PROM_READ   0xA0  
 
 MS5611::MS5611(String n) : Sensor(n), pressure(0), temperature(0) {}
 
+// This part initalice I2C, reset sensor and read calibreation data
 bool MS5611::setup() {
     Wire.begin();
     Wire.beginTransmission(MS5611_ADDR);
@@ -37,6 +43,8 @@ bool MS5611::setup() {
     return true;
 }
 
+// At this part we read pressure and temperature 
+// with high resolution(This is to get it more accurate)
 void MS5611::update() {
     if (!initialized) return;
 
@@ -62,6 +70,7 @@ void MS5611::update() {
     pressure = ((D1 * SENS / 2097152 - OFF) / 32768.0) / 100.0; // hPa
 }
 
+// This part print status, pressure and temperature
 void MS5611::info() {
     Serial.print(F("[MS5611] "));
     Serial.print(name);
@@ -89,6 +98,8 @@ bool MS5611::readPROM() {
     }
     return true;
 }
+
+/*-------  below here is more for communication in I2C ------- */
 
 bool MS5611::startConversion(uint8_t cmd) {
     Wire.beginTransmission(MS5611_ADDR);
