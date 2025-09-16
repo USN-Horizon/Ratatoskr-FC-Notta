@@ -1,43 +1,53 @@
-#include <Wire.h>
-#include <LSM6DSO32.h>
+#include "LSM6DSO32Sensor.h"
 
-//får tak i dette fra karnugh-filter.ino filen
-extern void karnaugh_filter(float ax, float ay, float az, float gx, float gy, float gz);
+LSM6DSO32Sensor::LSM6DSO32Sensor(String n) 
+    : Sensor(n) 
+{}
 
-void setup_old() {
-    Serial.begin(115200);
-    while (!Serial);  // Vent til seriell monitor er klar
+bool LSM6DSO32Sensor::setup() {
+    if (!imu.begin_I2C()) {
+        Serial.print(F("["));
+        Serial.print(name);
+        Serial.println(F("] kunne ikke finne LSM6DSO32 på I2C!"));
+        setReady(false);
+        return false;
+    }
 
-    //if (!IMU.begin()) {
-    //    Serial.println("Kunne ikke finne LSM6DSO32-sensor!");
-    //    while (1);
-    //}
+    // Konfigurer måleområder og sample rate
+    imu.setAccelRange(LSM6DSO32_ACCEL_RANGE_8_G);  // 4/8/16/32 G
+    imu.setGyroRange(LSM6DS_GYRO_RANGE_2000_DPS);  // 125-2000 dps
+    imu.setAccelDataRate(LSM6DS_RATE_104_HZ);      // typisk 104 Hz
+    imu.setGyroDataRate(LSM6DS_RATE_104_HZ);
 
-    Serial.println("LSM6DSO32 funnet!");
+    setReady(true);
+    return true;
 }
 
-void loop_old() {
-    /*float ax, ay, az; // Akselerometerverdier
-    float gx, gy, gz; // Gyroskopverdier
+void LSM6DSO32Sensor::update() {
+    if (!isReady()) return;
 
-    if (IMU.accelerationAvailable() && IMU.gyroscopeAvailable()) {
-        IMU.readAcceleration(ax, ay, az);
-        IMU.readGyroscope(gx, gy, gz);
-
-        Serial.print("Akselerasjon (g): ");
-        Serial.print(ax); Serial.print(", ");
-        Serial.print(ay); Serial.print(", ");
-        Serial.println(az);
-
-        Serial.print("Gyroskop (dps): "); // dps - degree per second
-        Serial.print(gx); Serial.print(", ");
-        Serial.print(gy); Serial.print(", ");
-        Serial.println(gz);
-
-        Serial.println("-----------------------");
-
-        karnaugh_filter(ax, ay, az, gx, gy, gz); //Tenker at denne funksjonen er fra annen ino-fil
-    }*/
-    
-    delay(500); // Vent 500ms før neste maaling
+    imu.getEvent(&accel, &gyro, &temp);
 }
+
+void LSM6DSO32Sensor::info() {
+    Sensor::info();
+    if (isReady()) {
+        Serial.print(F("  Accel (m/s^2): X="));
+        Serial.print(accel.acceleration.x);
+        Serial.print(F(" Y="));
+        Serial.print(accel.acceleration.y);
+        Serial.print(F(" Z="));
+        Serial.println(accel.acceleration.z);
+
+        Serial.print(F("  Gyro (rad/s): X="));
+        Serial.print(gyro.gyro.x);
+        Serial.print(F(" Y="));
+        Serial.print(gyro.gyro.y);
+        Serial.print(F(" Z="));
+        Serial.println(gyro.gyro.z);
+
+        Serial.print(F("  Temp (°C): "));
+        Serial.println(temp.temperature);
+    }
+}
+
