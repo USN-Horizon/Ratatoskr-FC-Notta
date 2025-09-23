@@ -6,6 +6,8 @@
 // Custom IMU implementation
 class IMU_Fake : public IMU {
 public:
+    ~IMU_Fake() override = default;
+
     void Read(FC_Data &data) override {
         // Our own, custom implementation here...
 

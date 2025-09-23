@@ -13,6 +13,8 @@ public:
     {
         // INITIALIZE
     }
+
+    ~IMU_True() override = default;
     
     void Read(FC_Data &data) override {
         // ACTUAL IMPLEMENTATION HERE
