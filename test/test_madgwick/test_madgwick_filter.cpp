@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "../lib/filters/madgwick_filter.h"
+#include "madgwick_filter.h"
 #include <cmath>
 
 void setUp(void) {
