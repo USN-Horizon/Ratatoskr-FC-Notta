@@ -1,8 +1,8 @@
-#include "madgwick_filter.h"
+#include "kalman_filter.h"
 
 
 
-void madgwick_filter::filter_update(float acc_x, float acc_y,float acc_z,float gyro_x, float gyro_y, float gyro_z)
+void kalman_filter::filter_update(float acc_x, float acc_y,float acc_z,float gyro_x, float gyro_y, float gyro_z)
 {
     //local vars
     float norm; //for vector normalization
@@ -97,23 +97,17 @@ void madgwick_filter::filter_update(float acc_x, float acc_y,float acc_z,float g
 }
 
 
-
-float madgwick_filter::get_w()
-{
-    return q_w; 
-}
-
-float madgwick_filter::get_x()
+float kalman_filter::get_x()
 {
     return q_x; 
 }
 
-float madgwick_filter::get_y()
+float kalman_filter::get_y()
 {
     return q_y; 
 }
 
-float madgwick_filter::get_z()
+float kalman_filter::get_z()
 {
     return q_z; 
 }
