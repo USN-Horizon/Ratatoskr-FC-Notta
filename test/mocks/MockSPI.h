@@ -5,13 +5,14 @@
 
 class MockSPI : public SPIInterface {
 public:
-    bool transfer(const uint8_t* tx, uint8_t* rx, size_t len) override {
-        // simple fake: invert bits of tx into rx
+    bool transfer(const uint8_t* txData, uint8_t* rxData, size_t len) override {
+        // Fyll buffer med et forutsigbart mønster
         for (size_t i = 0; i < len; i++) {
-            rx[i] = tx[i] ^ 0xFF;
+            if (rxData) rxData[i] = 0xA0 + i;
         }
         return true;
     }
 };
 
 #endif
+
