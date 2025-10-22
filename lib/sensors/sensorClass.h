@@ -1,17 +1,18 @@
-// Sensor.h
 #pragma once
 #include <Arduino.h>
 
 class Sensor {
 protected:
-    String name;          // navn (for logging/debug)
-    bool initialized;     // status (init OK eller ikke)
+    String name;          
+    bool initialized;     
+    unsigned long intervalMs;
+    unsigned long _lastUpdate;
 
 public:
-    Sensor(String n = "Sensor") : name(n), initialized(false) {}
+    Sensor(const String &n = "Sensor", unsigned long interval = 1000) 
+        : name(n), initialized(false), intervalMs(interval), _lastUpdate(0) {}
     virtual ~Sensor() {}
 
-    // Må implementeres av alle
     virtual bool setup() = 0;    // start/initialiser 
     virtual void update() = 0;   // les data / send data
 
@@ -22,9 +23,19 @@ public:
         Serial.println(initialized ? F(" OK") : F(" ikke initialisert"));
     }
 
-    // Nyttige fellesmetoder
     bool isReady() const { return initialized; }
     String getName() const { return name; }
+    unsigned long getInterval() const { return intervalMs; }
+    void setInterval(unsigned long ms) { intervalMs = ms; }
+
+    bool shouldUpdate() {
+        unsigned long now = millis();
+        if (now - _lastUpdate >= intervalMs) {
+            _lastUpdate = now;
+            return true;
+        }
+        return false;
+    }
 
 protected:
     // For avledede klasser → kan kalles inni setup()
