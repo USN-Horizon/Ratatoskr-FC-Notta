@@ -1,5 +1,5 @@
 // LoRaSensor.cpp
-#include "LoRaSensor.h"
+#include "SX1280.h"
 #include <Arduino.h>
 
 // constructor
