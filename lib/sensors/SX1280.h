@@ -1,6 +1,5 @@
 #pragma once
-
-#include "Sensor.h"
+#include "sensorClass.h"
 #include <RadioLib.h>
 
 // Pins for SX1280 LoRa
