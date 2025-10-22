@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include <Adafruit_LSM6DSO32.h>
-#include "Sensor.h"
+#include "sensorClass.h"
 
 // Driver for LSM6DSO32 (gyro + akselerometer)
 class LSM6DSO32Sensor : public Sensor {
