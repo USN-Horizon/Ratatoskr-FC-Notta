@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include <Wire.h>
-#include "Sensor.h"
+#include "sensorClass.h"
 
 // MS5611 I2C-adresse 
 #define MS5611_ADDR 0x77
