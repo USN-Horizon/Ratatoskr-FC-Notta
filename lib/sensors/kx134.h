@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#include "Sensor.h"  
+#include "sensorClass.h"  
 
 class KX134Sensor : public Sensor {
 public:
