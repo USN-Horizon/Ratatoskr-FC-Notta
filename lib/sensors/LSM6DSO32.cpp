@@ -1,4 +1,4 @@
-#include "LSM6DSO32Sensor.h"
+#include "LSM6DSO32.h"
 
 LSM6DSO32Sensor::LSM6DSO32Sensor(String n) 
     : Sensor(n) 
