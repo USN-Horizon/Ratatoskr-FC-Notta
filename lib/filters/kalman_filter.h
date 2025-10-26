@@ -20,6 +20,14 @@ class kalman_filter
         }
 
         // we might need to use the output of the madgwick filter to orient the forces onto the rocket.
+        // See f.eks. http://davesrocketworks.com/rockets/rnd/2004/KalmanApogeeII.pdf - Non Vertical Flight
+
+        // So we want a linear data set and a constant acceleration. Otherwise the maths are too hard.
+        // Paper says he got it to run well at only 4MHz (!). We have 600MHz, meaning we use 0.66% of the
+        // clock capacity (very rough estimation ofc, but beyond promising)
+
+        //
+
 
         //this is the main function for the filter.
         // The inputs are the accelerometer, GPS, and barometer
