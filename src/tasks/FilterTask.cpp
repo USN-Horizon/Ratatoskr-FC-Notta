@@ -1,4 +1,5 @@
 #include "FilterTask.h"
+#include "../../lib/filters/kalman_filter.h"
 
 TaskHandle_t filterTaskHandle = NULL;
 

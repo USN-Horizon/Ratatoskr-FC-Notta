@@ -4,12 +4,8 @@
 /**
  * Update the filter state to the next discrete time iteration. Transforms the system state to the next
  * iteration based on measurements.
- * @param acc_x The acceleration in the x-axis measured in this discrete time iteration
- * @param acc_y The acceleration in the y-axis measured in this discrete time iteration
- * @param acc_z The acceleration in the z-axis measured in this discrete time iteration
- * @param barometric_height The height extrapolated from barometric measurement in this discrete time iteration
  */
-void kalman_filter::filter_update(float acc_x, float acc_y,float acc_z, float barometric_height) {
+void KalmanFilter::filter_update(float s, float v, float a) {
 
     // === CALCULATION CONTEXT ===
 
@@ -63,14 +59,14 @@ void kalman_filter::filter_update(float acc_x, float acc_y,float acc_z, float ba
 }
 
 
-float kalman_filter::get_x() {
-    return q_x; 
+float KalmanFilter::get_s() {
+    return x(0);  // position
 }
 
-float kalman_filter::get_y() {
-    return q_y; 
+float KalmanFilter::get_v() {
+    return x(1);  // speed
 }
 
-float kalman_filter::get_z() {
-    return q_z; 
+float KalmanFilter::get_a() {
+    return x(2);  // acceleration
 }
