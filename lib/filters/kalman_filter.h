@@ -1,13 +1,13 @@
 #pragma once
 #include <cmath>
-#define MADGWICK_FILTER_H
+#define KALMAN_FILTER_H
 
 class kalman_filter
 {
     private:
         float q_w{1.0};
         float q_x{0};
-        float q_y{0}; 
+        float q_y{0};
         float q_z{0}; 
 
         float delta_t = 0.001f;
@@ -31,7 +31,7 @@ class kalman_filter
 
         //this is the main function for the filter.
         // The inputs are the accelerometer, GPS, and barometer
-        void filter_update(float acc_x, float acc_y,float acc_z,float gyro_x, float gyro_y, float gyro_z);
+        void filter_update(float acc_x, float acc_y, float acc_z, float barometric_height);
 
         /* Things to note!:
          * - GPS module might cut out at v>515m/s due to regulations to prevent it being used for military applications
