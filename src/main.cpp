@@ -1,6 +1,7 @@
 #include "arduino_freertos.h"
 #include "semphr.h"
-#include "tasks/SensorTask.h"
+#include "tasks/LowRateTask.h"
+#include "tasks/HighRateTask.h"
 #include "tasks/FilterTask.h"
 #include "tasks/LogTask.h"
 #include "tasks/ActuationTask.h"
@@ -10,7 +11,7 @@
 // Extern definition in task.h will allow the task to use these values
 FC_Data fc_data;
 // This mutex will lock all values in fc_data, even values that are not correlated.
-// If this becomes a problem, we could create multiple mutexes that lock each value seperatelly instead.
+// If this becomes a problem, we could create multiple mutexes that lock each value separately instead.
 SemaphoreHandle_t fc_data_mutex; 
 
 void setup() {
@@ -22,7 +23,8 @@ void setup() {
     while (true);
   }
 
-  init_task_Sensor();
+  init_task_LowRate();
+  init_task_HighRate();
   init_task_Filter();
   init_task_Log();
   init_task_Actuation();
