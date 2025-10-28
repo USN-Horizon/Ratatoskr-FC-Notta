@@ -9,7 +9,7 @@ void task_HighRate(void *pvParameters) {
     while (1) {
         // Read IMU data
         
-        // Read BME280
+        // Read MS5611 data
 
         // Read accelerometer-module
         
