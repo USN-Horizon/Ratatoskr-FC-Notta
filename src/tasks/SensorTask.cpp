@@ -1,14 +1,36 @@
 #include "SensorTask.h"
 #include "../../lib/sensors/BME280.cpp"
 #include "../../lib/sensors/LSM6DSO32.cpp"
+#include "../../lib/sensors/MAX_M10S.cpp"
+#include "../../lib/sensors/kx134.cpp"
 
 TaskHandle_t sensorTaskHandle = NULL;
+
+KX134Sensor kx134(500);
+MAXM10SSensor gps(1000);
+
+
+void setupSensor(Sensor &sensor, const char* name){
+    if(!sensor.setup()){
+        Serial.print(F("[SensorTask] "));
+        Serial.print(name);
+        Serial.println(F(" init failed!"));
+    }
+    else {sensor.info();}    
+}
+
 
 void task_Sensor(void *pvParameters) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xFrequency = pdMS_TO_TICKS(SENSOR_TASK_PERIOD_MS);
+
+    setupSensor(kx134, "KX134");
+    setupSensor(gps, "MAX-M10S");
     
     while (1) {
+        kx134.update();
+        gps.update();
+        
         // Read IMU data
         
         // Read BME280
