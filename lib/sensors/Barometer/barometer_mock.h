@@ -1,12 +1,12 @@
-#ifndef BAROMETER_FAKE_H
-#define BAROMETER_FAKE_H
+#ifndef BAROMETER_MOCK_H
+#define BAROMETER_MOCK_H
 
 #include "barometer.h"
 
 // Custom Barometer implementation
-class Barometer_Fake : public Barometer {
+class Barometer_Mock : public Barometer {
 public:
-    ~Barometer_Fake() override = default;
+    ~Barometer_Mock() override = default;
 
     void Read(FC_Data &data) override {
         // Our own, custom implementation here...
@@ -17,4 +17,4 @@ public:
 private:
 };
 
-#endif // BAROMETER_FAKE_H
+#endif // BAROMETER_MOCK_H

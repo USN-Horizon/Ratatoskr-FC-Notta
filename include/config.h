@@ -7,6 +7,6 @@
 
 /**
  *  USE_FAKE_IMPLEMENTATIONS:
- *  HAL will create hardware objects with fake (custom) implementations.
+ *  HAL will create hardware objects with mock (custom) implementations.
  */
-#define USE_FAKE_IMPLEMENTATIONS
+#define USE_MOCK_IMPLEMENTATIONS

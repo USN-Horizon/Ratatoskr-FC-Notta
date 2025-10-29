@@ -3,22 +3,22 @@
 #include "../../include/config.h"
 
 // Based on defines in config.h, include relevant headers
-#ifdef USE_FAKE_IMPLEMENTATIONS
-#include "../sensors/Barometer/barometer_fake.h"
-#include "../sensors/IMU/imu_fake.h"
+#ifdef USE_MOCK_IMPLEMENTATIONS
+#include "../sensors/Barometer/barometer_mock.h"
+#include "../sensors/IMU/imu_mock.h"
 #else
 #include "../sensors/Barometer/barometer_true.h"
 #include "../sensors/IMU/imu_true.h"
-#endif // USE_FAKE_IMPLEMENTATIONS
+#endif // USE_MOCK_IMPLEMENTATIONS
 
 HAL::HAL() {
-#ifdef USE_FAKE_IMPLEMENTATIONS
-    baro = new Barometer_Fake();
-    imu = new IMU_Fake();
+#ifdef USE_MOCK_IMPLEMENTATIONS
+    baro = new Barometer_Mock();
+    imu = new IMU_Mock();
 #else
     baro = new Barometer_True();
     imu = new IMU_True();
-#endif // USE_FAKE_IMPLEMENTATIONS
+#endif // USE_MOCK_IMPLEMENTATIONS
 }
 
 HAL::~HAL() {
