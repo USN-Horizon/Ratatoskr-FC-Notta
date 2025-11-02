@@ -420,6 +420,12 @@ void test_kalman_filter_full_rocket_flight() {
     // Filter should track altitude reasonably (within 10m of true at key points)
     TEST_ASSERT_FLOAT_WITHIN(10.0f, true_s, filter.get_s());
 
+    // Filter should track time of apogee reasonably (within 1.5s of true)
+    TEST_ASSERT_FLOAT_WITHIN(10.0f, true_apogee_time, apogee_time);
+    snprintf(msg, sizeof(msg), "Delta apogee detection time (positive number means late detection): %.1f",
+             true_apogee_time - apogee_time);
+    TEST_MESSAGE(msg);
+
     // No NaN values throughout flight
     TEST_ASSERT_FALSE(isnan(filter.get_s()));
     TEST_ASSERT_FALSE(isnan(filter.get_v()));
