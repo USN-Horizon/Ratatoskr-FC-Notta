@@ -39,7 +39,7 @@ class KalmanFilter
             x << s, v, a;
 
             // Initialize state transition matrix phi as identity
-            // Will be updated dynamically in filter_update() based on actual dt
+            // Will be updated dynamically in filter_update() based on actual dt (top right part needs changing)
             phi = Eigen::Matrix<float, 3, 3>::Identity();
 
             // Initialize measurement matrix H
@@ -63,13 +63,14 @@ class KalmanFilter
 
             // Initialize measurement noise covariance R
             // Diagonal: [position_variance, acceleration_variance]
-            // Based on sensor specs: MS5611 barometer (σ=0.1m), LSM6DSO32 accel (σ=0.053m/s²)
+            // Based on sensor specs: MS5611 barometer (σ=0.1m), LSM6DSO32 accel (σ=0.053m/s² squared)
             R << 0.01f,   0,
                  0,       0.0028f;
         }
 
         // we might need to use the output of the madgwick filter to orient the forces onto the rocket.
         // See f.eks. http://davesrocketworks.com/rockets/rnd/2004/KalmanApogeeII.pdf - Non Vertical Flight
+        // Update: we might not. the sensor fusion works well enough to counteract this
 
         // the paper does a great job at describing the math we need! I'll base my code upon that paper,
         // but will be using the math library Eigen, to make the code more readable for
