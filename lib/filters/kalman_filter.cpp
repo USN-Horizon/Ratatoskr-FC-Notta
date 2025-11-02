@@ -90,12 +90,12 @@ void KalmanFilter::filter_update(const float s, const float a, const float delta
 
     // Calculate the Kalman gain
     // K = P_pred * H^T * (H * P_pred * H^T + R)^-1
-    Eigen::Matrix<float, 2, 2> S = H * P_pred * H.transpose() + R;  // Innovation covariance
-    Eigen::Matrix<float, 3, 2> K = P_pred * H.transpose() * S.inverse();  // Kalman gain
+    const Eigen::Matrix<float, 2, 2> S = H * P_pred * H.transpose() + R;  // Innovation covariance
+    const Eigen::Matrix<float, 3, 2> K = P_pred * H.transpose() * S.inverse();  // Kalman gain
 
     // Update the state estimate using the measurement
     // x_corr = x_pred + K * (z - H * x_pred)
-    Eigen::Matrix<float, 2, 1> innovation = z - H * x_pred;  // Innovation (measurement residual)
+    const Eigen::Matrix<float, 2, 1> innovation = z - H * x_pred;  // Innovation (measurement residual)
     x = x_pred + K * innovation;
 
     // Update the error covariance
