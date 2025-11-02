@@ -26,10 +26,10 @@ class KalmanFilter
         Eigen::Matrix<float, 2, 2> R;
 
         // Identity matrix (for calculations)
-        Eigen::Matrix<float, 3, 3> I;
+        Eigen::Matrix<float, 3, 3> I = Eigen::Matrix<float, 3, 3>::Identity();
 
         float delta_t = 0.001f;
-        float gyro_mesurement_error = 3.14159265358979f * (5.0f / 180.0f);
+        float gyro_mesurement_error = M_PI * (5.0f / 180.0f);
         float beta = sqrt(3.0f / 4.0f) * gyro_mesurement_error; 
     public:  
         KalmanFilter(
@@ -51,11 +51,6 @@ class KalmanFilter
             // Row 1: measures position (barometer)
             // Row 2: measures acceleration (accelerometer)
             H << 1, 0, 0,
-                 0, 0, 1;
-
-            // Initialize identity matrix
-            I << 1, 0, 0,
-                 0, 1, 0,
                  0, 0, 1;
 
             // Initialize error covariance matrix P_0 (initial uncertainty)

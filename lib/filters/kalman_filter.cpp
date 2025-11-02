@@ -5,7 +5,7 @@
  * Update the filter state to the next discrete time iteration. Transforms the system state to the next
  * iteration based on measurements.
  */
-void KalmanFilter::filter_update(float s, float v, float a) {
+void KalmanFilter::filter_update(const float s, const float v, const float a) {
 
     // === CALCULATION CONTEXT ===
 
@@ -64,7 +64,7 @@ void KalmanFilter::filter_update(float s, float v, float a) {
 
     // Predict the error covariance
     // P_pred = phi * P_prev * phi^T + Q
-    Eigen::Matrix<float, 3, 3> P_pred = phi * P * phi.transpose() + Q;
+    const Eigen::Matrix<float, 3, 3> P_pred = phi * P * phi.transpose() + Q;
 
 
     // === STEP 2: CORRECTION ===
