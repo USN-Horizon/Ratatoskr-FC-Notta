@@ -273,8 +273,8 @@ void test_kalman_filter_full_rocket_flight() {
 
     // Initialize seeded random number generators for reproducible noise
     std::mt19937 rng(42);  // Fixed seed for deterministic tests
-    std::normal_distribution<float> noise_dist_s(0.0f, 0.05f);  // Mean=0, StdDev=5cm
-    std::normal_distribution<float> noise_dist_a(0.0f, 0.2f);   // Mean=0, StdDev=0.2 m/s²
+    std::normal_distribution<float> noise_dist_s(0.0f, 0.1f);   // Mean=0, StdDev=10cm (MS5611 altitude resolution)
+    std::normal_distribution<float> noise_dist_a(0.0f, 0.053f); // Mean=0, StdDev=0.053 m/s² (LSM6DSO32 ±32g RMS noise)
 
     snprintf(msg, sizeof(msg), "\n=== ROCKET FLIGHT SIMULATION ===");
     TEST_MESSAGE(msg);
@@ -293,8 +293,8 @@ void test_kalman_filter_full_rocket_flight() {
         true_s += true_v * dt;
 
         // Simulate sensor measurements with normally distributed noise
-        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=5cm
-        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.2 m/s²
+        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
+        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
 
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
@@ -351,8 +351,8 @@ void test_kalman_filter_full_rocket_flight() {
         }
 
         // Simulate sensor measurements with normally distributed noise
-        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=5cm
-        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.2 m/s²
+        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
+        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
 
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
@@ -384,8 +384,8 @@ void test_kalman_filter_full_rocket_flight() {
         true_s = apogee_altitude + 0.5f * g * descent_time * descent_time;
 
         // Simulate sensor measurements with normally distributed noise
-        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=5cm
-        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.2 m/s²
+        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
+        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
 
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
