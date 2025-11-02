@@ -220,10 +220,24 @@ inline void print_status(const float time, const KalmanFilter& filter, const flo
 }
 
 inline float thrust_accel(const float t, const float burn_time) {
-    // acceleration is approximately quadratic, with peak at ~65% of burn time
-    return 190 - 8*(t-burn_time*0.65)*(t-burn_time*0.65);
+    // acceleration is approximately quadratic, with peak at ~44% of burn time
+    return std::max(0.0f, 195.0f - 8*(t-burn_time*0.44f)*(t-burn_time*0.44f));
 }
 
+/**
+ * @brief Simulates a complete rocket flight and tests the Kalman filter's ability
+ *        to track the rocket's state (position, velocity, and acceleration) throughout
+ *        all stages of flight.
+ *
+ * This method performs a series of simulations for the following phases of a rocket flight:
+ * - Thrust phase: Simulates rocket acceleration due to motor thrust until burnout.
+ * - Coast phase: Simulates the rocket's motion from motor burnout to apogee (when velocity reaches zero).
+ * - Descent phase: Simulates initial descent under gravity after apogee.
+ *
+ * The acceleration values are calculated using the motor and airframe specifications of the Ratatoskr rocket.
+ * Which rocket of which the forces are simulated from is not really that important. What's important is testing
+ * the deviance from the true path.
+ */
 void test_kalman_filter_full_rocket_flight() {
     // Simulate a complete rocket flight: thrust, coast, apogee, descent
     char msg[200];
@@ -236,12 +250,18 @@ void test_kalman_filter_full_rocket_flight() {
 
     // Flight parameters
     //float thrust_accel = 155.0f;  // Motor thrust acceleration (m/s²) - Converted to function, because it's not constant
-    float burn_time = 3.75f;      // Motor burn time (seconds)
+    float burn_time = 6.3f;      // Motor burn time (seconds)
+    // Is only this high because thust accel is variable. mean max accel time is more like 3.75
 
     // Tracking variables
     float true_s = 0.0f;  // True position
     float true_v = 0.0f;  // True velocity
     float true_a = 0.0f;  // True acceleration
+
+    // all of these are true / non-filter values
+    float true_max_altitude = 0.0f;
+    float true_apogee_time = 0.0f;
+    bool true_apogee_reached = false;
 
     float max_altitude = 0.0f;
     float apogee_time = 0.0f;
@@ -263,8 +283,8 @@ void test_kalman_filter_full_rocket_flight() {
 
         // True dynamics: acceleration = thrust - gravity
         true_a = thrust_accel(t, burn_time) + g - air_resistance(true_s, true_v, drag_coef, drag_area);
-        true_v = true_a * t;
-        true_s = 0.5f * true_a * t * t;
+        true_v += true_a * dt;
+        true_s += true_v * dt;
 
         // Simulate sensor measurements with small noise
         float noise_s = (i % 3 == 0) ? 0.05f : -0.05f;  // ±5cm altitude noise
@@ -303,18 +323,23 @@ void test_kalman_filter_full_rocket_flight() {
 
         // True dynamics: gravity + air resistance (extrapolated from graph given from airframe oct 2025)
         true_a = g - air_resistance(true_s, true_v, drag_coef, drag_area);
-        true_v = burnout_v + g * coast_time;
-        true_s = burnout_s + burnout_v * coast_time + 0.5f * g * coast_time * coast_time;
+        true_v += true_a * dt;
+        true_s += true_v * dt;
 
-        // Stop at apogee (velocity becomes negative)
-        if (true_v <= 0.0f && !apogee_detected) {
-            max_altitude = true_s;
+        if (filter.get_v() <= 0.0f && !apogee_detected) {
+            max_altitude = filter.get_s();
             apogee_time = total_time;
             apogee_detected = true;
+        }
+        // Stop phase at true apogee (velocity becomes negative)
+        if (true_v <= 0.0f) {
+            true_max_altitude = true_s;
+            true_apogee_time = total_time;
+            true_apogee_reached = true;
 
             snprintf(msg, sizeof(msg),
                      "\nAPOGEE REACHED at t=%.2fs: Alt=%.1fm (filter=%.1fm)",
-                     apogee_time, max_altitude, filter.get_s());
+                     true_apogee_time, true_max_altitude, filter.get_s());
             TEST_MESSAGE(msg);
             break;
         }
@@ -344,7 +369,7 @@ void test_kalman_filter_full_rocket_flight() {
 
     for (int i = 1; i <= (int)(max_descent_time / dt); i++) {
         descent_time = i * dt;
-        float total_time = apogee_time + descent_time;
+        float total_time = true_apogee_time + descent_time;
 
         // True dynamics: free fall with gravity
         // (In reality, would have drag and parachute, but simplified here)
@@ -370,7 +395,9 @@ void test_kalman_filter_full_rocket_flight() {
     // FINAL SUMMARY
     snprintf(msg, sizeof(msg), "\n=== FLIGHT SUMMARY ===");
     TEST_MESSAGE(msg);
-    snprintf(msg, sizeof(msg), "Max altitude: %.1fm (detected at t=%.2fs)", max_altitude, apogee_time);
+    snprintf(msg, sizeof(msg), "Max altitude: %.1fm (reached at t=%.2fs)", true_max_altitude, true_apogee_time);
+    TEST_MESSAGE(msg);
+    snprintf(msg, sizeof(msg), "Detected max altitude: %.1fm (reached at t=%.2fs)", max_altitude, apogee_time);
     TEST_MESSAGE(msg);
     snprintf(msg, sizeof(msg), "Burnout altitude: %.1fm at t=%.1fs", burnout_s, burn_time);
     TEST_MESSAGE(msg);
@@ -379,9 +406,10 @@ void test_kalman_filter_full_rocket_flight() {
     TEST_MESSAGE(msg);
 
     // Assertions to verify filter performance
-    TEST_ASSERT_TRUE(apogee_detected);  // Should reach apogee
-    TEST_ASSERT_TRUE(max_altitude > 7000.0f);  // Should reach reasonable altitude
-    TEST_ASSERT_TRUE(max_altitude < 11000.0f);  // But not unreasonably high
+    // This one isn't really evaluating the filter performance, more the realism of the sim forces applied
+    TEST_ASSERT_TRUE(true_apogee_reached);  // Should reach apogee
+    TEST_ASSERT_TRUE(true_max_altitude > 7000.0f);  // Should reach reasonable altitude
+    TEST_ASSERT_TRUE(true_max_altitude < 11000.0f);  // But not unreasonably high
 
     // Filter should track altitude reasonably (within 10m of true at key points)
     TEST_ASSERT_FLOAT_WITHIN(10.0f, true_s, filter.get_s());
