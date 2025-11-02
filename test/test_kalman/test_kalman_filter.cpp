@@ -1,6 +1,7 @@
 #include <unity.h>
 #include <cmath>
 #include <stdio.h>
+#include <random>
 #include "kalman_filter.h"
 #include "sim_helpers.h"
 
@@ -270,6 +271,11 @@ void test_kalman_filter_full_rocket_flight() {
     constexpr float drag_coef = 0.044f; // guesswork (TODO: check with airframe)
     constexpr float drag_area = M_PI*0.065*0.065; // 13cm diameter => 6.5 (TODO: double check)
 
+    // Initialize seeded random number generators for reproducible noise
+    std::mt19937 rng(42);  // Fixed seed for deterministic tests
+    std::normal_distribution<float> noise_dist_s(0.0f, 0.05f);  // Mean=0, StdDev=5cm
+    std::normal_distribution<float> noise_dist_a(0.0f, 0.2f);   // Mean=0, StdDev=0.2 m/s²
+
     snprintf(msg, sizeof(msg), "\n=== ROCKET FLIGHT SIMULATION ===");
     TEST_MESSAGE(msg);
 
@@ -286,9 +292,9 @@ void test_kalman_filter_full_rocket_flight() {
         true_v += true_a * dt;
         true_s += true_v * dt;
 
-        // Simulate sensor measurements with small noise
-        float noise_s = (i % 3 == 0) ? 0.05f : -0.05f;  // ±5cm altitude noise
-        float noise_a = (i % 5 == 0) ? 0.2f : -0.2f;    // ±0.2 m/s² accel noise
+        // Simulate sensor measurements with normally distributed noise
+        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=5cm
+        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.2 m/s²
 
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
@@ -344,9 +350,9 @@ void test_kalman_filter_full_rocket_flight() {
             break;
         }
 
-        // Simulate sensor measurements with noise
-        float noise_s = (i % 3 == 0) ? 0.05f : -0.05f;
-        float noise_a = (i % 5 == 0) ? 0.2f : -0.2f;
+        // Simulate sensor measurements with normally distributed noise
+        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=5cm
+        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.2 m/s²
 
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
@@ -377,9 +383,9 @@ void test_kalman_filter_full_rocket_flight() {
         true_v = g * descent_time;  // Negative velocity
         true_s = apogee_altitude + 0.5f * g * descent_time * descent_time;
 
-        // Simulate sensor measurements
-        float noise_s = (i % 3 == 0) ? 0.05f : -0.05f;
-        float noise_a = (i % 5 == 0) ? 0.2f : -0.2f;
+        // Simulate sensor measurements with normally distributed noise
+        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=5cm
+        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.2 m/s²
 
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
