@@ -6,8 +6,27 @@
 class KalmanFilter
 {
     private:
-        // State vector: [s_x, s_y, s_z, v_x, v_y, v_z, a_x, a_y, a_z]
+        // State vector: [s, v, a] (position, velocity, acceleration)
         Eigen::Matrix<float, 3, 1> x;
+
+        // State transition matrix (transforms state from time k-1 to k)
+        Eigen::Matrix<float, 3, 3> phi;
+
+        // Measurement matrix (transforms state to measurement space)
+        // Measures position (barometer) and acceleration (accelerometer)
+        Eigen::Matrix<float, 2, 3> H;
+
+        // Error covariance matrix
+        Eigen::Matrix<float, 3, 3> P;
+
+        // Process noise covariance matrix
+        Eigen::Matrix<float, 3, 3> Q;
+
+        // Measurement noise covariance matrix
+        Eigen::Matrix<float, 2, 2> R;
+
+        // Identity matrix (for calculations)
+        Eigen::Matrix<float, 3, 3> I;
 
         float delta_t = 0.001f;
         float gyro_mesurement_error = 3.14159265358979f * (5.0f / 180.0f);
@@ -19,6 +38,44 @@ class KalmanFilter
         {
             // Initialize state vector with constructor arguments
             x << s, v, a;
+
+            // Initialize state transition matrix phi based on kinematic equations:
+            // s_(t+dt) = s_t + v_t*dt + a_t*(dt^2)/2
+            // v_(t+dt) = v_t + a_t*dt
+            // a_(t+dt) = a_t
+            phi << 1, delta_t, (delta_t * delta_t) / 2.0f,
+                   0, 1,       delta_t,
+                   0, 0,       1;
+
+            // Initialize measurement matrix H
+            // Row 1: measures position (barometer)
+            // Row 2: measures acceleration (accelerometer)
+            H << 1, 0, 0,
+                 0, 0, 1;
+
+            // Initialize identity matrix
+            I << 1, 0, 0,
+                 0, 1, 0,
+                 0, 0, 1;
+
+            // Initialize error covariance matrix P_0 (initial uncertainty)
+            // Diagonal matrix with initial variances for [s, v, a]
+            P << 10.0f, 0,     0,
+                 0,     5.0f,  0,
+                 0,     0,     2.0f;
+
+            // Initialize process noise covariance Q
+            // Represents uncertainty in the process model
+            // These values should be tuned based on system characteristics
+            Q << 0.1f, 0,     0,
+                 0,    0.1f,  0,
+                 0,    0,     0.1f;
+
+            // Initialize measurement noise covariance R
+            // Diagonal: [position_variance, acceleration_variance]
+            // These values should be tuned based on sensor characteristics
+            R << 1.0f, 0,
+                 0,    0.5f;
         }
 
         // we might need to use the output of the madgwick filter to orient the forces onto the rocket.
@@ -48,7 +105,7 @@ class KalmanFilter
 
         // the goal is to get the estimate of the position (p_hat)
         //helper functions
-        float get_s();
-        float get_v();
-        float get_a();
+        float get_s() const;
+        float get_v() const;
+        float get_a() const;
 };

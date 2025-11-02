@@ -39,7 +39,6 @@ void KalmanFilter::filter_update(float s, float v, float a) {
     // the silly ass KGain_k is pretty complex. Luckily, the values converge, so they can
     // be calculated beforehand, making the real-time computation pretty light.
 
-    // --- One iteration of k ---
     // First we need to establish the prediction of the error covariance, using previous corrected error covariance
     // P_(k_pred) = phi_prev * P_(prev_corr) * (phi_prev)^T + Q_prev
 
@@ -56,17 +55,51 @@ void KalmanFilter::filter_update(float s, float v, float a) {
     // In this case, we have one measurement leading to s (position: barometric measurement),
     // and another leading to a (accelerometer).
 
+
+    // === STEP 1: PREDICTION ===
+
+    // Predict the state based on the system model
+    // x_pred = phi * x_prev
+    Eigen::Matrix<float, 3, 1> x_pred = phi * x;
+
+    // Predict the error covariance
+    // P_pred = phi * P_prev * phi^T + Q
+    Eigen::Matrix<float, 3, 3> P_pred = phi * P * phi.transpose() + Q;
+
+
+    // === STEP 2: CORRECTION ===
+
+    // Create measurement vector z from sensor inputs
+    // z = [s, a] (position from barometer, acceleration from accelerometer)
+    // Note: velocity v is not directly measured, only estimated
+    Eigen::Matrix<float, 2, 1> z;
+    z << s, a;
+
+    // Calculate the Kalman gain
+    // K = P_pred * H^T * (H * P_pred * H^T + R)^-1
+    Eigen::Matrix<float, 2, 2> S = H * P_pred * H.transpose() + R;  // Innovation covariance
+    Eigen::Matrix<float, 3, 2> K = P_pred * H.transpose() * S.inverse();  // Kalman gain
+
+    // Update the state estimate using the measurement
+    // x_corr = x_pred + K * (z - H * x_pred)
+    Eigen::Matrix<float, 2, 1> innovation = z - H * x_pred;  // Innovation (measurement residual)
+    x = x_pred + K * innovation;
+
+    // Update the error covariance
+    // P_corr = (I - K * H) * P_pred
+    P = (I - K * H) * P_pred;
+
 }
 
 
-float KalmanFilter::get_s() {
+float KalmanFilter::get_s() const {
     return x(0);  // position
 }
 
-float KalmanFilter::get_v() {
+float KalmanFilter::get_v() const {
     return x(1);  // speed
 }
 
-float KalmanFilter::get_a() {
+float KalmanFilter::get_a() const {
     return x(2);  // acceleration
 }
