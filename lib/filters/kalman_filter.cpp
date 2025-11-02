@@ -4,8 +4,12 @@
 /**
  * Update the filter state to the next discrete time iteration. Transforms the system state to the next
  * iteration based on measurements.
+ *
+ * @param s: measured position (from barometer)
+ * @param a: measured acceleration (from accelerometer)
+ * @param delta_t: time step since last update (seconds)
  */
-void KalmanFilter::filter_update(const float s, const float v, const float a) {
+void KalmanFilter::filter_update(const float s, const float a, const float delta_t) {
 
     // === CALCULATION CONTEXT ===
 
@@ -57,6 +61,15 @@ void KalmanFilter::filter_update(const float s, const float v, const float a) {
 
 
     // === STEP 1: PREDICTION ===
+
+    // Update state transition matrix phi with the actual time step
+    // phi transforms state from time k-1 to k based on kinematic equations:
+    // s_(t+dt) = s_t + v_t*dt + a_t*(dt^2)/2
+    // v_(t+dt) = v_t + a_t*dt
+    // a_(t+dt) = a_t
+    phi << 1, delta_t, (delta_t * delta_t) / 2.0f,
+           0, 1,       delta_t,
+           0, 0,       1;
 
     // Predict the state based on the system model
     // x_pred = phi * x_prev

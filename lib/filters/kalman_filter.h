@@ -28,7 +28,6 @@ class KalmanFilter
         // Identity matrix (for calculations)
         Eigen::Matrix<float, 3, 3> I = Eigen::Matrix<float, 3, 3>::Identity();
 
-        float delta_t = 0.001f;
         float gyro_mesurement_error = M_PI * (5.0f / 180.0f);
         float beta = sqrt(3.0f / 4.0f) * gyro_mesurement_error; 
     public:  
@@ -39,13 +38,9 @@ class KalmanFilter
             // Initialize state vector with constructor arguments
             x << s, v, a;
 
-            // Initialize state transition matrix phi based on kinematic equations:
-            // s_(t+dt) = s_t + v_t*dt + a_t*(dt^2)/2
-            // v_(t+dt) = v_t + a_t*dt
-            // a_(t+dt) = a_t
-            phi << 1, delta_t, (delta_t * delta_t) / 2.0f,
-                   0, 1,       delta_t,
-                   0, 0,       1;
+            // Initialize state transition matrix phi as identity
+            // Will be updated dynamically in filter_update() based on actual dt
+            phi = Eigen::Matrix<float, 3, 3>::Identity();
 
             // Initialize measurement matrix H
             // Row 1: measures position (barometer)
@@ -60,17 +55,17 @@ class KalmanFilter
                  0,     0,     2.0f;
 
             // Initialize process noise covariance Q
-            // Represents uncertainty in the process model
-            // These values should be tuned based on system characteristics
-            Q << 0.1f, 0,     0,
-                 0,    0.1f,  0,
-                 0,    0,     0.1f;
+            // Represents uncertainty in the process model (changing thrust, air resistance, etc.)
+            // Higher values = less trust in model, more trust in measurements
+            Q << 0.5f, 0,     0,
+                 0,    0.5f,  0,
+                 0,    0,     1.0f;
 
             // Initialize measurement noise covariance R
             // Diagonal: [position_variance, acceleration_variance]
-            // These values should be tuned based on sensor characteristics
-            R << 1.0f, 0,
-                 0,    0.5f;
+            // Based on sensor specs: MS5611 barometer (σ=0.1m), LSM6DSO32 accel (σ=0.053m/s²)
+            R << 0.01f,   0,
+                 0,       0.0028f;
         }
 
         // we might need to use the output of the madgwick filter to orient the forces onto the rocket.
@@ -90,8 +85,12 @@ class KalmanFilter
 
 
         //this is the main function for the filter.
-        // The inputs are the accelerometer and barometer
-        void filter_update(float s, float v, float a);
+        // The inputs are the accelerometer and barometer, plus the time step
+        // @param s: measured position (from barometer)
+        // @param a: measured acceleration (from accelerometer)
+        // @param delta_t: time step since last update (seconds)
+        // Note: velocity v is not currently used as we don't have a direct measurement
+        void filter_update(float s, float a, float delta_t);
 
         /* Things to note!:
          * - GPS module might cut out at v>515m/s due to regulations to prevent it being used for military applications

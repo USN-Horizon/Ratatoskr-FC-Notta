@@ -23,9 +23,11 @@ void test_kalman_filter_stationary_object() {
     // Test a stationary object (no movement, no acceleration)
     KalmanFilter filter(0.0f, 0.0f, 0.0f);
 
+    const float dt = 0.001f;
+
     // Update with stationary measurements
     for (int i = 0; i < 100; i++) {
-        filter.filter_update(0.0f, 0.0f, 0.0f);
+        filter.filter_update(0.0f, 0.0f, dt);
     }
 
     // Should converge to zero position, velocity, and acceleration
@@ -44,7 +46,7 @@ void test_kalman_filter_constant_velocity() {
     // Simulate constant velocity motion
     for (int i = 0; i < 100; i++) {
         const float expected_s = 10.0f * (i + 1) * dt;  // s = v * t
-        filter.filter_update(expected_s, 0.0f, 0.0f);  // position increases, no acceleration
+        filter.filter_update(expected_s, 0.0f, dt);  // position increases, no acceleration
 
         // Print every 20 iterations to see progression
         if (i % 20 == 0) {
@@ -74,7 +76,7 @@ void test_kalman_filter_constant_acceleration() {
         const float t = i * dt;
         const float expected_s = 0.5f * a * t * t;  // s = 0.5 * a * t^2
 
-        filter.filter_update(expected_s, 0.0f, a);
+        filter.filter_update(expected_s, a, dt);
     }
 
     // Acceleration should remain around 9.81 m/s^2
@@ -85,10 +87,12 @@ void test_kalman_filter_noisy_measurements() {
     // Test filter's ability to smooth noisy measurements
     KalmanFilter filter(0.0f, 0.0f, 0.0f);
 
+    const float dt = 0.001f;
+
     // Add noise to position measurements but keep acceleration at zero
     for (int i = 0; i < 100; i++) {
         float noise = (i % 2 == 0) ? 0.5f : -0.5f;  // Alternating noise
-        filter.filter_update(0.0f + noise, 0.0f, 0.0f);
+        filter.filter_update(0.0f + noise, 0.0f, dt);
     }
 
     // Filtered position should be close to zero despite noisy measurements
@@ -99,22 +103,24 @@ void test_kalman_filter_no_nan_values() {
     // Ensure filter doesn't produce NaN values with various inputs
     KalmanFilter filter(100.0f, 50.0f, 10.0f);
 
+    const float dt = 0.001f;
+
     // Test with zero measurements
-    filter.filter_update(0.0f, 0.0f, 0.0f);
+    filter.filter_update(0.0f, 0.0f, dt);
 
     TEST_ASSERT_FALSE(isnan(filter.get_s()));
     TEST_ASSERT_FALSE(isnan(filter.get_v()));
     TEST_ASSERT_FALSE(isnan(filter.get_a()));
 
     // Test with large measurements
-    filter.filter_update(1000.0f, 0.0f, 100.0f);
+    filter.filter_update(1000.0f, 100.0f, dt);
 
     TEST_ASSERT_FALSE(isnan(filter.get_s()));
     TEST_ASSERT_FALSE(isnan(filter.get_v()));
     TEST_ASSERT_FALSE(isnan(filter.get_a()));
 
     // Test with negative measurements
-    filter.filter_update(-50.0f, 0.0f, -20.0f);
+    filter.filter_update(-50.0f, -20.0f, dt);
 
     TEST_ASSERT_FALSE(isnan(filter.get_s()));
     TEST_ASSERT_FALSE(isnan(filter.get_v()));
@@ -125,9 +131,11 @@ void test_kalman_filter_position_tracking() {
     // Test that filter tracks position measurements
     KalmanFilter filter(0.0f, 0.0f, 0.0f);
 
+    const float dt = 0.001f;
+
     // Move to position 10m
     for (int i = 0; i < 50; i++) {
-        filter.filter_update(10.0f, 0.0f, 0.0f);
+        filter.filter_update(10.0f, 0.0f, dt);
     }
 
     // Position should converge to 10m
@@ -135,7 +143,7 @@ void test_kalman_filter_position_tracking() {
 
     // Move to position 20m
     for (int i = 0; i < 50; i++) {
-        filter.filter_update(20.0f, 0.0f, 0.0f);
+        filter.filter_update(20.0f, 0.0f, dt);
     }
 
     // Position should converge to 20m
@@ -154,7 +162,7 @@ void test_kalman_filter_velocity_estimation() {
     // Need more iterations for velocity to converge from position-only data
     for (int i = 1; i <= 1000; i++) {
         float expected_s = velocity * i * dt;
-        filter.filter_update(expected_s, 0.0f, 0.0f);
+        filter.filter_update(expected_s, 0.0f, dt);
     }
 
     // Filter should show positive velocity trend
@@ -178,7 +186,7 @@ void test_kalman_filter_freefall_simulation() {
         float s = v0 * t + 0.5f * g * t * t;  // Kinematic equation
         //float v = v0 + g * t; not needed
 
-        filter.filter_update(s, 0.0f, g);
+        filter.filter_update(s, g, dt);
     }
 
     // Acceleration should track gravity
@@ -202,7 +210,7 @@ void test_kalman_filter_measurement_fusion() {
     for (int i = 1; i <= 100; i++) {
         float t = i * dt;
         float s = 0.5f * a * t * t;  // Position from acceleration
-        filter.filter_update(s, 0.0f, a);
+        filter.filter_update(s, a, dt);
     }
 
     // Both position and acceleration should be tracked
@@ -298,7 +306,7 @@ void test_kalman_filter_full_rocket_flight() {
         const float measured_s = true_s + noise_s;
         const float measured_a = true_a + noise_a;
 
-        filter.filter_update(measured_s, 0.0f, measured_a);
+        filter.filter_update(measured_s, measured_a, dt);
 
         // Print every 0.5 seconds
         if (i % 500 == 0) {
@@ -356,7 +364,7 @@ void test_kalman_filter_full_rocket_flight() {
         float measured_s = true_s + noise_s;
         float measured_a = true_a + noise_a;
 
-        filter.filter_update(measured_s, 0.0f, measured_a);
+        filter.filter_update(measured_s, measured_a, dt);
 
         // Print every 0.5 seconds
         if (i % 500 == 0) {
@@ -389,7 +397,7 @@ void test_kalman_filter_full_rocket_flight() {
         const float measured_s = true_s + noise_s;
         const float measured_a = true_a + noise_a;
 
-        filter.filter_update(measured_s, 0.0f, measured_a);
+        filter.filter_update(measured_s, measured_a, dt);
 
         // Print every 0.5 seconds
         if (i % 500 == 0) {
