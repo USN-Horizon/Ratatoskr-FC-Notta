@@ -38,12 +38,12 @@ void test_kalman_filter_constant_velocity() {
     // Test object moving at constant velocity
     KalmanFilter filter(0.0f, 10.0f, 0.0f);
 
-    float dt = 0.001f;  // Time step from the filter
+    const float dt = 0.001f;
     char msg[100];
 
     // Simulate constant velocity motion
     for (int i = 0; i < 100; i++) {
-        float expected_s = 10.0f * (i + 1) * dt;  // s = v * t
+        const float expected_s = 10.0f * (i + 1) * dt;  // s = v * t
         filter.filter_update(expected_s, 0.0f, 0.0f);  // position increases, no acceleration
 
         // Print every 20 iterations to see progression
@@ -66,14 +66,13 @@ void test_kalman_filter_constant_acceleration() {
     // Test object with constant acceleration
     KalmanFilter filter(0.0f, 0.0f, 9.81f);
 
-    float dt = 0.001f;
-    float a = 9.81f;  // Acceleration (e.g., gravity)
+    const float dt = 0.001f;
+    const float a = 9.81f;  // Acceleration (e.g., gravity)
 
     // Simulate constant acceleration
     for (int i = 1; i <= 50; i++) {
-        float t = i * dt;
-        float expected_s = 0.5f * a * t * t;  // s = 0.5 * a * t^2
-        float expected_v = a * t;              // v = a * t
+        const float t = i * dt;
+        const float expected_s = 0.5f * a * t * t;  // s = 0.5 * a * t^2
 
         filter.filter_update(expected_s, 0.0f, a);
     }
@@ -169,15 +168,15 @@ void test_kalman_filter_freefall_simulation() {
     // Simulate a rocket in freefall after burnout
     KalmanFilter filter(0.0f, 0.0f, -9.81f);
 
-    float dt = 0.001f;
-    float g = -9.81f;
-    float v0 = 100.0f;  // Initial upward velocity
+    const float dt = 0.001f;
+    const float g = -9.81f;
+    const float v0 = 100.0f;  // Initial upward velocity
 
     // Simulate 100 steps of freefall
     for (int i = 1; i <= 100; i++) {
         float t = i * dt;
         float s = v0 * t + 0.5f * g * t * t;  // Kinematic equation
-        float v = v0 + g * t;
+        //float v = v0 + g * t; not needed
 
         filter.filter_update(s, 0.0f, g);
     }
@@ -197,8 +196,8 @@ void test_kalman_filter_measurement_fusion() {
     KalmanFilter filter(0.0f, 0.0f, 0.0f);
 
     // Provide consistent position and acceleration measurements
-    float a = 5.0f;
-    float dt = 0.001f;
+    const float a = 5.0f;
+    const float dt = 0.001f;
 
     for (int i = 1; i <= 100; i++) {
         float t = i * dt;
@@ -283,9 +282,9 @@ void test_kalman_filter_full_rocket_flight() {
     snprintf(msg, sizeof(msg), "\nPHASE 1: THRUST (0 - %.1f s)", burn_time);
     TEST_MESSAGE(msg);
 
-    int thrust_steps = (int)(burn_time / dt);
+    const int thrust_steps = static_cast<int>(burn_time / dt);
     for (int i = 1; i <= thrust_steps; i++) {
-        float t = i * dt;
+        const float t = i * dt;
 
         // True dynamics: acceleration = thrust - gravity
         true_a = thrust_accel(t, burn_time) + g - air_resistance(true_s, true_v, drag_coef, drag_area);
@@ -293,11 +292,11 @@ void test_kalman_filter_full_rocket_flight() {
         true_s += true_v * dt;
 
         // Simulate sensor measurements with normally distributed noise
-        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
-        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
+        const float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
+        const float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
 
-        float measured_s = true_s + noise_s;
-        float measured_a = true_a + noise_a;
+        const float measured_s = true_s + noise_s;
+        const float measured_a = true_a + noise_a;
 
         filter.filter_update(measured_s, 0.0f, measured_a);
 
@@ -323,7 +322,7 @@ void test_kalman_filter_full_rocket_flight() {
     float coast_time = 0.0f;
     float max_coast_time = 40.0f;  // Max 40 seconds coast
 
-    for (int i = 1; i <= (int)(max_coast_time / dt); i++) {
+    for (int i = 1; i <= static_cast<int>(max_coast_time / dt); i++) {
         coast_time = i * dt;
         float total_time = burn_time + coast_time;
 
@@ -373,7 +372,7 @@ void test_kalman_filter_full_rocket_flight() {
     float descent_time = 0.0f;
     float max_descent_time = 2.0f;  // Simulate 2 seconds of descent
 
-    for (int i = 1; i <= (int)(max_descent_time / dt); i++) {
+    for (int i = 1; i <= static_cast<int>(max_descent_time / dt); i++) {
         descent_time = i * dt;
         float total_time = true_apogee_time + descent_time;
 
@@ -384,11 +383,11 @@ void test_kalman_filter_full_rocket_flight() {
         true_s = apogee_altitude + 0.5f * g * descent_time * descent_time;
 
         // Simulate sensor measurements with normally distributed noise
-        float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
-        float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
+        const float noise_s = noise_dist_s(rng);  // Gaussian noise, σ=10cm
+        const float noise_a = noise_dist_a(rng);  // Gaussian noise, σ=0.053 m/s²
 
-        float measured_s = true_s + noise_s;
-        float measured_a = true_a + noise_a;
+        const float measured_s = true_s + noise_s;
+        const float measured_a = true_a + noise_a;
 
         filter.filter_update(measured_s, 0.0f, measured_a);
 

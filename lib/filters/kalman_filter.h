@@ -105,7 +105,7 @@ class KalmanFilter
 
         // the goal is to get the estimate of the position (p_hat)
         //helper functions
-        float get_s() const;
-        float get_v() const;
-        float get_a() const;
+        [[nodiscard]] float get_s() const;
+        [[nodiscard]] float get_v() const;
+        [[nodiscard]] float get_a() const;
 };
