@@ -1,5 +1,5 @@
 #include "ActuationTask.h"
-#include "../MAX_M10S.h" //GNSS
+
 
 TaskHandle_t actuationTaskHandle = NULL;
 FlightState flight_state = NOT_READY;
@@ -8,9 +8,8 @@ SemaphoreHandle_t fc_data_mutex;
 
 #include <cstddef>
 
-MAX_M10S GNSS;
-
-void analogWrite(int pin, int value) {
+template <typename T>
+void analogWrite(int pin, T value) {
 
 }
 
@@ -24,11 +23,16 @@ void task_Actuation(void *pvParameters) {
 			//not ready yet....
 		}
         // Calculate servo/motor commands
-        
+        analogWrite
+
         // Execute deployment sequences (drougue, and main)
         switch (flight_state) {
-			case NOT_READY:
+			case DROUGE:
 
+			break;
+			case MAIN:
+
+			break;
 		}
         // Safety checks and failsafe operations
         
