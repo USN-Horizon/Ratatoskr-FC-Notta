@@ -14,7 +14,6 @@ extern SemaphoreHandle_t fc_data_mutex;
 
 extern TaskHandle_t actuationTaskHandle;
 
-extern FlightState flight_state;
 
 void task_Actuation(void *pvParameters);
 void init_task_Actuation(void);

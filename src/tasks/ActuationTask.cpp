@@ -1,17 +1,15 @@
 #include "ActuationTask.h"
 
 
+
 TaskHandle_t actuationTaskHandle = NULL;
-FlightState flight_state = NOT_READY;
 FC_Data fc_data;
 SemaphoreHandle_t fc_data_mutex;
 
 #include <cstddef>
 
-template <typename T>
-void analogWrite(int pin, T value) {
+const TickType_t delayTime = pdMS_TO_TICKS(50); //delay for 50ms
 
-}
 
 void task_Actuation(void *pvParameters) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
@@ -19,18 +17,20 @@ void task_Actuation(void *pvParameters) {
     
     while (1) {
         // Check flight state and control requirements
-        if (flight_state == NOT_READY) {
+        while (fc_data.flightstate == FlightState::NOT_READY) {
 			//not ready yet....
+			vTaskDelay(delayTime);
 		}
+
         // Calculate servo/motor commands
-        analogWrite
+
 
         // Execute deployment sequences (drougue, and main)
-        switch (flight_state) {
-			case DROUGE:
+        switch (fc_data.flightstate) {
+        case FlightState::DROUGE:
 
 			break;
-			case MAIN:
+        case FlightState::MAIN:
 
 			break;
 		}
