@@ -1,14 +1,9 @@
 #include "ActuationTask.h"
-
-
-
-TaskHandle_t actuationTaskHandle = NULL;
-FC_Data fc_data;
-SemaphoreHandle_t fc_data_mutex;
-
 #include <cstddef>
 
-const TickType_t delayTime = pdMS_TO_TICKS(50); //delay for 50ms
+TaskHandle_t actuationTaskHandle = NULL;
+
+
 
 
 void task_Actuation(void *pvParameters) {
@@ -17,20 +12,21 @@ void task_Actuation(void *pvParameters) {
     
     while (1) {
         // Check flight state and control requirements
-        while (fc_data.flightstate == FlightState::NOT_READY) {
+        if (fc_data.flightstate == FlightState::NOT_READY) {
 			//not ready yet....
-			vTaskDelay(delayTime);
+
 		}
 
         // Calculate servo/motor commands
 
-
         // Execute deployment sequences (drougue, and main)
         switch (fc_data.flightstate) {
         case FlightState::DROUGE:
+            // first deployment sequence:
 
 			break;
         case FlightState::MAIN:
+            // second deployment sequence:
 
 			break;
 		}
