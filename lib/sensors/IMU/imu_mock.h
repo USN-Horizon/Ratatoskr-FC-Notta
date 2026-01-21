@@ -1,21 +1,14 @@
 #ifndef IMU_MOCK_H
 #define IMU_MOCK_H
 
-#include "imu.h"
+#include "sensor.h"
 
-// Custom IMU implementation
-class IMU_Mock : public IMU {
+class IMU_Mock : public Sensor {
 public:
-    ~IMU_Mock() override = default;
+    IMU_Mock();
+    ~IMU_Mock() override;
 
-    void Read(FC_Data &data) override {
-        // Our own, custom implementation here...
-
-        data.imu_acc_raw = {};
-        data.imu_ang_vel_raw = {};
-        data.imu_mag_raw = {};
-    }
-private:
+    void Read(FC_Data& data) override;
 };
 
 #endif // IMU_MOCK_H

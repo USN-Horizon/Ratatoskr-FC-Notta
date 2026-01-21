@@ -1,20 +1,14 @@
-#ifndef BAROMETER_MOCK_H
-#define BAROMETER_MOCK_H
+#ifndef BARO_MOCK_H
+#define BARO_MOCK_H
 
-#include "barometer.h"
+#include "sensor.h"
 
-// Custom Barometer implementation
-class Barometer_Mock : public Barometer {
+class Barometer_Mock : public Sensor {
 public:
-    ~Barometer_Mock() override = default;
+    Barometer_Mock();
+    ~Barometer_Mock() override;
 
-    void Read(FC_Data &data) override {
-        // Our own, custom implementation here...
-
-        data.baro_pres_raw = 0.0f;
-        data.baro_temp_raw = 0.0f;
-    }
-private:
+    void Read(FC_Data& data) override;
 };
 
-#endif // BAROMETER_MOCK_H
+#endif // BARO_MOCK_H
