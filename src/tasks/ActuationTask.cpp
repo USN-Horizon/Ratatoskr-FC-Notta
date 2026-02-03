@@ -15,10 +15,12 @@ void task_Actuation(void *pvParameters) {
         // Check flight state and control requirements
         while (fc_data.flightstate == FlightState::NOT_READY || fc_data.flightstate == FlightState::ARMED)
         {
-            if (Servo.attached() == false)
+            if (!Servo.attached())
             {
-                std::cerr << "Servo attachment has failed" << std::endl;
+                Serial.println("Servo attachment has failed");
+                Servo.attach(Servo_Pin, 0, Servo_Angle);
             }
+            delay(100);
         }
 
         // Calculate servo/motor commands
@@ -38,7 +40,12 @@ void task_Actuation(void *pvParameters) {
 
         // Safety checks and failsafe operations
 
-        
+        if (Servo.read() > Servo_Angle || Servo.read() < 0)
+        {
+            //the servo could potentially get damaged beyond 180 degrees or below 0
+            Servo.detach();
+            Serial.println("Servo has been detached");
+        }
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }
