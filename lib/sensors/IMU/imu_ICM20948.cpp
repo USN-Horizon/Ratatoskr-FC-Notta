@@ -1,8 +1,6 @@
 #include "imu_ICM20948.h"
 
-#include "FreeRTOS.h"
-
-IMU_ICM20948::IMU_ICM20948(TwoWire& wire, int i2c_addr, String& name = "IMU (ICM20948)")
+IMU_ICM20948::IMU_ICM20948(TwoWire& wire, int i2c_addr, const String& name)
     :
     Sensor(name)
 {

@@ -1,8 +1,6 @@
 #ifndef HAL_H
 #define HAL_H
 
-#include "../include/config.h"
-
 #ifdef USE_MOCK_IMPLEMENTATIONS
 #include "../sensors/IMU/imu_mock.h"
 #include "../sensors/Barometer/barometer_mock.h"

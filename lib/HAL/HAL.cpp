@@ -1,8 +1,5 @@
 #include "HAL.h"
 
-#include <Arduino.h>
-#include "FreeRTOS.h"
-
 HAL::HAL() = default;
 
 HAL::~HAL() {

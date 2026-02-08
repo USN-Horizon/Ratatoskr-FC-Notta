@@ -10,7 +10,7 @@
 
 class IMU_ICM20948 : public Sensor {
 public:
-    IMU_ICM20948(TwoWire& wire, int i2c_addr = ICM20948_ADDR, String& name = "IMU (ICM20948)");
+    explicit IMU_ICM20948(TwoWire& wire, int i2c_addr = ICM20948_ADDR, const String& name = "IMU (ICM20948)");
     ~IMU_ICM20948() override;
 
     void Read(FC_Data &data) override;

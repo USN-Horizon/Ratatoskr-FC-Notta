@@ -1,7 +1,7 @@
 #ifndef IMU_MOCK_H
 #define IMU_MOCK_H
 
-#include "sensor.h"
+#include "../sensor.h"
 
 class IMU_Mock : public Sensor {
 public:

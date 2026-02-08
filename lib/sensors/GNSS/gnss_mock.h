@@ -1,7 +1,7 @@
 #ifndef GNSS_MOCK_H
 #define GNSS_MOCK_H
 
-#include "sensor.h"
+#include "../sensor.h"
 
 class GNSS_Mock : public Sensor {
 public:
