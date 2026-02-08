@@ -1,20 +1,17 @@
 #include "HAL.h"
 
 #include <Arduino.h>
-#include "config.h"
 #include "FreeRTOS.h"
 
-#ifdef USE_MOCK_IMPLEMENTATIONS
-#include "../sensors/IMU/imu_mock.h"
-#include "../sensors/Barometer/barometer_mock.h"
-#include "../sensors/GNSS/gnss_mock.h"
-#else
-#include "../sensors/IMU/imu_ICM20948.h"
-#include "../sensors/Barometer/barometer_MS5611.h"
-#include "../sensors/GNSS/gnss_MAXM10S.h"
-#endif // USE_MOCK_IMPLEMENTATIONS
+HAL::HAL() = default;
 
-HAL::HAL() {
+HAL::~HAL() {
+    delete imu;
+    delete baro;
+    delete gnss;
+}
+
+bool HAL::Begin() {
 #ifdef USE_MOCK_IMPLEMENTATIONS
     imu = new IMU_Mock();
     baro = new Barometer_Mock();
@@ -29,16 +26,12 @@ HAL::HAL() {
 
     // Check that all sensors initialised successfully
     if (!CheckAllSensorInit()) {
-        return;
+        return false;
     }
 
     good = true;
-}
 
-HAL::~HAL() {
-    delete imu;
-    delete baro;
-    delete gnss;
+    return true;
 }
 
 bool HAL::Good() const {
