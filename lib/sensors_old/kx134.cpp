@@ -1,4 +1,4 @@
-#include "kx134.h"
+#include "../kx134.h"
 
 // SPI pin for CS
 #define CS_PIN 6  
