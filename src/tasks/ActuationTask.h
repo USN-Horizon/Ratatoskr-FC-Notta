@@ -5,7 +5,7 @@
 #define ACTUATION_TASK_PRIORITY 5
 #define ACTUATION_TASK_PERIOD_MS 50
 #define Servo_Angle 180 //angle variable for reference, will be changed once we get more information
-#define Servo_Pin 10  // pin number is unkown as of right now, given an arbitrary value
+#define Servo_Pin 10  // pin number is unknown as of right now, given an arbitrary value
 
 #include "FreeRTOS.h"
 #include "task.h"
