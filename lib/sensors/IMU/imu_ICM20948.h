@@ -4,16 +4,18 @@
 #include "sensor.h"
 
 #include <Wire.h>
-#include <ICM_20948.h>
+#include <ICM20948_WE.h>
+
+#define ICM20948_ADDR 0x68
 
 class IMU_ICM20948 : public Sensor {
 public:
-    IMU_ICM20948(TwoWire& wire, bool ad0_pin = LOW, String& name = "IMU (ICM20948)");
+    explicit IMU_ICM20948(TwoWire& wire, int i2c_addr = ICM20948_ADDR, const String& name = "IMU (ICM20948)");
     ~IMU_ICM20948() override;
 
     void Read(FC_Data &data) override;
 private:
-    ICM_20948_I2C icm;
+    ICM20948_WE imu;
 };
 
 #endif //IMU_ICM20948_H

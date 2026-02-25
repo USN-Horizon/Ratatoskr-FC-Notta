@@ -3,7 +3,7 @@
 // OSR stands for oversampling ratio, this is for more accurate results and less interference
 //Highest OSR is 4096 but converting takes 9ms
 
-#include "MS5611.h"
+#include "../MS5611.h"
 
 // MS5611 Commands
 #define CMD_RESET       0x1E

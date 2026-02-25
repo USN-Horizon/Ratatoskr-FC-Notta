@@ -13,7 +13,7 @@ Barometer_MS5611::Barometer_MS5611(TwoWire& wire, int i2c_addr, const String& na
 
 Barometer_MS5611::~Barometer_MS5611() = default;
 
-void Barometer_MS5611::Read(FC_Data &data) override {
+void Barometer_MS5611::Read(FC_Data &data) {
     baro.read();
 
     // Note: Library has built-in reading of altitude: baro.getAltitude();

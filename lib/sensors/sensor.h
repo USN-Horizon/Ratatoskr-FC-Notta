@@ -7,7 +7,7 @@
 class Sensor {
 public:
     explicit Sensor(const String& name);
-    virtual ~Sensor() = 0;
+    virtual ~Sensor() = default;
 
     // Read from the sensor, implementation specific
     virtual void Read(FC_Data& data) = 0;

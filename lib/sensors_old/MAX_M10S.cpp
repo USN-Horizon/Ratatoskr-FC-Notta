@@ -1,4 +1,4 @@
-#include "MAX_M10S.h"
+#include "../MAX_M10S.h"
 
 MAXM10SSensor::MAXM10SSensor(unsigned long interval)
     : Sensor("MAX-M10S", interval) {}
