@@ -7,7 +7,7 @@
 
 class Barometer_MS5611 : public Sensor {
 public:
-    explicit Barometer_MS5611(TwoWire& wire, int i2c_addr = MS5611_DEFAULT_ADDRESS, const String& name = "Barometer (MS5611)");
+    explicit Barometer_MS5611(TwoWire& wire, int i2c_addr = MS5611_DEFAULT_ADDRESS, const std::string& name = "Barometer (MS5611)");
     ~Barometer_MS5611() override;
 
     void Read(FC_Data &data) override;

@@ -1,6 +1,6 @@
 #include "barometer_MS5611.h"
 
-Barometer_MS5611::Barometer_MS5611(TwoWire& wire, int i2c_addr, const String& name)
+Barometer_MS5611::Barometer_MS5611(TwoWire& wire, int i2c_addr, const std::string& name)
     :
     Sensor(name),
     baro(i2c_addr, &wire)

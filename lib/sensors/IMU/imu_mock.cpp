@@ -2,7 +2,7 @@
 
 IMU_Mock::IMU_Mock()
     :
-    Sensor(F("IMU (Mock)"))
+    Sensor("IMU (Mock)")
 {
 
     good = true;

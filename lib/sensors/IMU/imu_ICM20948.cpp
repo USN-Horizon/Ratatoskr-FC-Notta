@@ -1,6 +1,6 @@
 #include "imu_ICM20948.h"
 
-IMU_ICM20948::IMU_ICM20948(TwoWire& wire, int i2c_addr, const String& name)
+IMU_ICM20948::IMU_ICM20948(TwoWire& wire, int i2c_addr, const std::string& name)
     :
     Sensor(name)
 {

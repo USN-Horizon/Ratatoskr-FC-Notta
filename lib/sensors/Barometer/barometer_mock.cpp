@@ -2,7 +2,7 @@
 
 Barometer_Mock::Barometer_Mock()
     :
-    Sensor(F("Barometer (Mock)"))
+    Sensor("Barometer (Mock)")
 {
     good = true;
 }

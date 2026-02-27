@@ -2,7 +2,7 @@
 
 GNSS_Mock::GNSS_Mock()
     :
-    Sensor(F("GNSS (Mock)"))
+    Sensor("GNSS (Mock)")
 {
     good = true;
 }

@@ -1,12 +1,12 @@
 #ifndef SENSOR_BASE_H
 #define SENSOR_BASE_H
 
-#include <Arduino.h>
+#include <string>
 #include "../../src/fc_data.h"
 
 class Sensor {
 public:
-    explicit Sensor(const String& name);
+    explicit Sensor(const std::string& name);
     virtual ~Sensor() = default;
 
     // Read from the sensor, implementation specific
@@ -15,13 +15,11 @@ public:
     // Current state of the sensor
     bool Good() const;
 
-    void PrintStatus() const;
-
     // Name of this sensor instance
-    const String& Name() const;
+    const std::string& Name() const;
 
 protected:
-    String name;
+    std::string name;
     bool good = false;
 };
 
