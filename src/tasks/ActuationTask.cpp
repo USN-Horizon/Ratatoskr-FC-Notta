@@ -18,14 +18,19 @@ void task_Actuation(void *pvParameters) {
         {
             if (!Servo.attached())
             {
+                #ifdef DEBUG_MODE
                 Serial.println("Servo attachment has failed");
+                #endif
+
                 Servo.attach(Servo_Pin, 0, Servo_Angle);
             }
             else
             {
+                #ifdef DEBUG_MODE
                 Serial.println("Servo is attached, waiting for takeoff");
+                #endif
             }
-            delay(30);
+            vTaskDelay(pdMS_TO_TICKS(30));
         }
 
 
@@ -45,7 +50,10 @@ void task_Actuation(void *pvParameters) {
         {
             //the servo could potentially get damaged beyond 180 degrees or below 0
             Servo.detach();
+
+            #ifdef DEBUG_MODE
             Serial.println("Servo has been detached");
+            #endif
         }
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
