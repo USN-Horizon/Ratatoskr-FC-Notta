@@ -31,7 +31,7 @@ bool HAL_true::CheckAllSensorInit() const {
 }
 
 bool HAL_true::CheckSensor(const Sensor * const sensor, int &error_count) const {
-    if (sensor->Good()) {
+    if (HAL::CheckSensor(sensor, error_count)) {
         Serial.print("[HAL]: Sensor \"");
         Serial.print(sensor->Name().c_str());
         Serial.println("\" initialised successfully.");
