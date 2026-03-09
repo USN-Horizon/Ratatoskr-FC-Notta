@@ -2,7 +2,7 @@
 
 #include "../lib/HAL/HAL_mock.h"
 
-HAL* hal;
+HAL* hal = nullptr;
 
 void setUp(void) {
    if (hal != nullptr) {
@@ -19,9 +19,7 @@ void tearDown(void) {
 }
 
 void test_HAL_initialization() {
-   const bool result = hal->Begin();
-
-   TEST_ASSERT_TRUE(result);
+   TEST_ASSERT_TRUE(hal->Begin());
    TEST_ASSERT_TRUE(hal->Good());
 }
 
