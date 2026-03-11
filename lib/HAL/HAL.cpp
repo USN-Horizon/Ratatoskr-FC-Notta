@@ -1,36 +1,42 @@
 #include "HAL.h"
 
-#include "../../include/config.h"
-
-// Based on defines in config.h, include relevant headers
-#ifdef USE_FAKE_IMPLEMENTATIONS
-#include "../sensors/Barometer/barometer_fake.h"
-#include "../sensors/IMU/imu_fake.h"
-#else
-#include "../sensors/Barometer/barometer_true.h"
-#include "../sensors/IMU/imu_true.h"
-#endif // USE_FAKE_IMPLEMENTATIONS
-
-HAL::HAL() {
-#ifdef USE_FAKE_IMPLEMENTATIONS
-    baro = new Barometer_Fake();
-    imu = new IMU_Fake();
-#else
-    baro = new Barometer_True();
-    imu = new IMU_True();
-#endif // USE_FAKE_IMPLEMENTATIONS
-}
+HAL::HAL() = default;
 
 HAL::~HAL() {
-    delete baro;
     delete imu;
+    delete baro;
+    delete gnss;
 }
 
-Barometer* HAL::GetBarometer() {
-    return baro;
+bool HAL::Good() const {
+    return good;
 }
 
-IMU *HAL::GetIMU() {
+const Sensor* HAL::IMU() const {
     return imu;
 }
+const Sensor* HAL::Barometer() const {
+    return baro;
+}
+const Sensor* HAL::GNSS() const {
+    return gnss;
+}
 
+bool HAL::CheckAllSensorInit() const {
+    int error_count = 0;
+
+    CheckSensor(imu, error_count);
+    CheckSensor(baro, error_count);
+    CheckSensor(gnss, error_count);
+
+    return error_count == 0;
+}
+
+bool HAL::CheckSensor(const Sensor * const sensor, int &error_count) const {
+    if (!sensor->Good()) {
+        error_count++;
+        return false;
+    }
+
+    return true;
+}
