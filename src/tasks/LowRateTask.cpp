@@ -2,7 +2,7 @@
 
 TaskHandle_t LowRateTaskHandle = NULL;
 
-void task_Sensor(void *pvParameters) {
+void task_LowRate(void *pvParameters) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xFrequency = pdMS_TO_TICKS(LOW_RATE_TASK_PERIOD_MS);
 
@@ -17,7 +17,7 @@ void task_Sensor(void *pvParameters) {
     }
 }
 
-void init_task_Sensor() {
+void init_task_LowRate() {
     xTaskCreate(
         task_LowRate,
         "LowRateTask",
