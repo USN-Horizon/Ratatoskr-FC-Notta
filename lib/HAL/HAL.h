@@ -1,21 +1,28 @@
 #ifndef HAL_H
 #define HAL_H
 
-#include "../sensors/Barometer/barometer.h"
-#include "../sensors/IMU/imu.h"
+#include "../sensors/sensor.h"
 
-// Hardware Abstraction Layer
-// Allows for custom and controlled implementation of hardware elements (mainly for testing)
 class HAL {
 public:
     HAL();
-    ~HAL();
+    virtual ~HAL();
 
-    Barometer* GetBarometer();
-    IMU* GetIMU();
-private:
-    Barometer* baro;
-    IMU* imu;
+    virtual bool Begin() = 0;
+    bool Good() const;
+
+    const Sensor* IMU() const;
+    const Sensor* Barometer() const;
+    const Sensor* GNSS() const;
+protected:
+    bool good = false;
+
+    // Sensors
+    Sensor *imu = nullptr, *baro = nullptr, *gnss = nullptr;
+
+protected:
+    virtual bool CheckAllSensorInit() const;
+    virtual bool CheckSensor(const Sensor* const sensor, int& error_count) const;
 };
 
 #endif // HAL_H

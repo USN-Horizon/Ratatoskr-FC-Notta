@@ -9,6 +9,8 @@ void task_LowRate(void *pvParameters) {
     while (1) {
         // Read GPS
 
+        // Read Barometer data
+
         // Read battery voltage
         
         // Store readings in shared data structure

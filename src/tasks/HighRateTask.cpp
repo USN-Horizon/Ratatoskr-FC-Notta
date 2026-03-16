@@ -9,10 +9,6 @@ void task_HighRate(void *pvParameters) {
     while (1) {
         // Read IMU data
         
-        // Read MS5611 data
-
-        // Read accelerometer-module
-        
         // Store readings in shared data structure
         
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
