@@ -2,6 +2,8 @@
 
 A flight controller firmware for Teensy 4.1 using FreeRTOS with modular task-based architecture.
 
+Further documentation can be found on the [USN Horizon Wiki](https://wiki.usnhorizon.no/en/project-ratatoskr/avionics).
+
 ## File Structure Format
 ```
 Ratatoskr-FC-Notta/
@@ -38,16 +40,3 @@ pio run --target upload
 # Open serial monitor
 pio device monitor
 ```
-
-## Architecture
-
-TODO: update with FreeRTOS structure?
-
-![](./docs/SoftwareDesignOverview.drawio.svg)
-
-The firmware uses FreeRTOS with separate tasks:
-- **SensorTask**: Reads IMU and environmental sensors
-- **FilterTask**: Processes sensor data 
-- **ActuationTask**: Controls outputs
-- **LogTask**: Data logging
-- **RadioTask**: Wireless communication
