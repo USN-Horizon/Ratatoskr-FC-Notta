@@ -8,7 +8,7 @@ void task_Actuation(void *pvParameters) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     constexpr TickType_t xFrequency = pdMS_TO_TICKS(ACTUATION_TASK_PERIOD_MS);
 
-    Servo.attach(Servo_Pin, 0, Servo_Angle);
+    Servo.attach(Servo_Pin);
     constexpr auto min_angle = Servo_Angle / 2;
 
     while (1) {
@@ -22,7 +22,7 @@ void task_Actuation(void *pvParameters) {
                 Serial.println("Servo attachment has failed");
                 #endif
 
-                Servo.attach(Servo_Pin, 0, Servo_Angle);
+                Servo.attach(Servo_Pin);
             }
             else
             {
@@ -49,7 +49,7 @@ void task_Actuation(void *pvParameters) {
         if (Servo.read() > Servo_Angle || Servo.read() < 0)
         {
             //the servo could potentially get damaged beyond 180 degrees or below 0
-            Servo.detach();
+            //Servo.detach();
 
             #ifdef DEBUG_MODE
             Serial.println("Servo has been detached");

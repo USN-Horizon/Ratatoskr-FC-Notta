@@ -11,14 +11,14 @@
 #include "task.h"
 #include "semphr.h"
 #include "../fc_data.h"
-#include <Servo.h>
+#include <PWMServo.h>
 
 extern FC_Data fc_data;
 extern SemaphoreHandle_t fc_data_mutex;
 
 extern TaskHandle_t actuationTaskHandle;
 
-extern Servo Servo;
+extern PWMServo Servo;
 
 void task_Actuation(void *pvParameters);
 void init_task_Actuation(void);
