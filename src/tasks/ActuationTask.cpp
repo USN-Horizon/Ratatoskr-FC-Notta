@@ -3,58 +3,75 @@
 #include <iostream>
 TaskHandle_t actuationTaskHandle = NULL;
 
+// TODO: Task syncronization
 
 void task_Actuation(void *pvParameters) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     constexpr TickType_t xFrequency = pdMS_TO_TICKS(ACTUATION_TASK_PERIOD_MS);
 
-    Servo.attach(Servo_Pin);
-    constexpr auto min_angle = Servo_Angle / 2;
+    // Attach servos
+    HPRS_Servo.attach(HPRS_Servo_pin);
+    if (!HPRS_Servo.attached()) {
+        #ifdef DEBUG_MODE
+        Serial.println("HPRS Servo could not attach!");
+        #endif
+
+        // TODO: Error handling
+    }
+
+    MCRS_Servo.attach(HPRS_Servo_pin);
+    if (!MCRS_Servo.attached()) {
+        #ifdef DEBUG_MODE
+        Serial.println("MCRS Servo could not attach!");
+        #endif
+
+        // TODO: Error handling
+    }
 
     while (1) {
-
-        // Check flight state and control requirements
-        while (fc_data.flightstate == FlightState::NOT_READY || fc_data.flightstate == FlightState::ARMED)
-        {
-            if (!Servo.attached())
-            {
-                #ifdef DEBUG_MODE
-                Serial.println("Servo attachment has failed");
-                #endif
-
-                Servo.attach(Servo_Pin);
-            }
-            else
-            {
-                #ifdef DEBUG_MODE
-                Serial.println("Servo is attached, waiting for takeoff");
-                #endif
-            }
-            vTaskDelay(pdMS_TO_TICKS(30));
-        }
-
-
-        // Execute deployment sequences (drougue, and main)
+        // Execute deployment sequences when necessary (drougue, and main)
         switch (fc_data.flightstate) {
-        case FlightState::DROUGE:
-			Servo.write(min_angle);
-			break;
-        case FlightState::MAIN:
-			Servo.write(Servo_Angle);
-			break;
-		}
+        case FlightState::APOGEE:
+            // Actuate HPRS servoes to deploy drouge chute
+            #ifdef DEBUG_MODE
+            Serial.println("HPRS Servo actuation begin");
+            #endif
 
-        // Safety checks and failsafe operations
-
-        if (Servo.read() > Servo_Angle || Servo.read() < 0)
-        {
-            //the servo could potentially get damaged beyond 180 degrees or below 0
-            //Servo.detach();
+			HPRS_Servo.write(HPRS_Servo_speed);
+            vTaskDelay(pdMS_TO_TICKS(HPRS_Servo_time_ms));
+            HPRS_Servo.write(servo_idle_speed);
 
             #ifdef DEBUG_MODE
-            Serial.println("Servo has been detached");
+            Serial.println("HPRS Servo actuation finished");
             #endif
-        }
+            
+            // Update flight state
+            fc_data.flightstate = FlightState::DROUGE;
+
+			break;
+        case FlightState::MAIN:
+            // Actuate MCRS servos to release main chute
+            #ifdef DEBUG_MODE
+            Serial.println("MCRS Servo actuation begin");
+            #endif
+
+			MCRS_Servo.write(MCRS_Servo_speed);
+            vTaskDelay(pdMS_TO_TICKS(MCRS_Servo_time_ms));
+            MCRS_Servo.write(servo_idle_speed);
+
+            #ifdef DEBUG_MODE
+            Serial.println("MCRS Servo actuation finished");
+            #endif
+            
+            // Update flight state
+            fc_data.flightstate = FlightState::POST_MAIN;
+
+			break;
+        default:
+            // Do nothing
+            break;
+		}
+
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }

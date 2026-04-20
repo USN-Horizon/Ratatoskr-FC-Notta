@@ -14,7 +14,9 @@ FC_Data fc_data;
 // If this becomes a problem, we could create multiple mutexes that lock each value separately instead.
 SemaphoreHandle_t fc_data_mutex; 
 
-PWMServo Servo;
+// TODO: Wrap these in HAL object
+PWMServo HPRS_Servo;
+PWMServo MCRS_Servo;
 
 void setup() {
   Serial.begin(9600);

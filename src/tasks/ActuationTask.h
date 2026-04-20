@@ -4,8 +4,6 @@
 #define ACTUATION_TASK_STACK_SIZE 256
 #define ACTUATION_TASK_PRIORITY 5
 #define ACTUATION_TASK_PERIOD_MS 50
-#define Servo_Angle 180 //angle variable for reference, will be changed once we get more information
-#define Servo_Pin 10  // pin number is unknown as of right now, given an arbitrary value
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -18,7 +16,18 @@ extern SemaphoreHandle_t fc_data_mutex;
 
 extern TaskHandle_t actuationTaskHandle;
 
-extern PWMServo Servo;
+// Servos are continuous (not positional).
+constexpr int servo_idle_speed = 90;
+
+constexpr int HPRS_Servo_speed = 180;
+constexpr int HPRS_Servo_time_ms = 2000;
+constexpr int HPRS_Servo_pin = 10; // TODO: Determine value
+extern PWMServo HPRS_Servo;
+
+constexpr int MCRS_Servo_speed = 180; // TODO: Determine value
+constexpr int MCRS_Servo_time_ms = 2000; // TODO: Determine value
+constexpr int MCRS_Servo_pin = 10; // TODO: Determine value
+extern PWMServo MCRS_Servo;
 
 void task_Actuation(void *pvParameters);
 void init_task_Actuation(void);
